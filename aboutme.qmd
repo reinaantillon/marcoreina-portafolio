@@ -2,7 +2,7 @@
 title: "About me"
 ---
 
-![](img/profilephoto.png){width="300"}{fig-align="center"}
+![](img/profilephoto.png){width="300"}
 
 ### Hello! I am Marco Reina, I am PhD student at the Department of Poultry Science. My work focusing on reducing *Salmonella* from poultry enviroments.
 
