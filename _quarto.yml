@@ -14,7 +14,7 @@ website:
             file: starter-analysis-exercise/starter-analysis-exercise.qmd
     right:
       - icon: github 
-        href: https://reinaantillon.github.io/marcoreina-portafolio/
+        href: https://github.com/reinaantillon/marcoreina-portafolio
 format:
   html:
     theme: cerulean
