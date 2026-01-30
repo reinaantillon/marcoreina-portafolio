@@ -99,3 +99,62 @@ summary(fit1)
 fit2 <- lm(life_expectancy ~ population, data = africandata_year2000)
 summary(fit2)
 ```
+
+```{r}
+#This section contributed by Riley Herber.
+
+#More Data Exploration
+
+#Analysis of Concentrations of the three main greenhouse gases carbon dioxide, methane and nitrous oxide from 1-2000 CE.
+
+#summary(greenhouse_gases)
+data <- greenhouse_gases
+
+#creates a data.frame object for each gas including year and concentrations
+CO2 <- greenhouse_gases[greenhouse_gases$gas == "CO2", ]
+CH4 <- greenhouse_gases[greenhouse_gases$gas == "CH4", ]
+N2O <- greenhouse_gases[greenhouse_gases$gas == "N2O", ]
+
+
+# set up an empty plot using all data to get axis limits
+plot(
+  greenhouse_gases$year,
+  greenhouse_gases$concentration,
+  type = "n",                
+  xlab = "Year",
+  ylab = "Concentration",
+  main = "Greenhouse Gas Concentrations Over Time"
+)
+
+# add lines for each gas
+lines(CO2$year, CO2$concentration, col = "blue", lwd = 2)
+lines(CH4$year, CH4$concentration, col = "green", lwd = 2)
+lines(N2O$year, N2O$concentration, col = "red", lwd = 2)
+
+# add legend
+legend(
+  "topleft",
+  legend = c("CO2", "CH4", "N2O"),
+  col = c("blue", "green", "red"),
+  lwd = 2
+)
+
+#ChatGPT was used to help me learn how to do multi-panel figure (code below)
+par(mfrow = c(3, 1))  # plot with 3 rows, 1 column
+
+plot(CO2$year, CO2$concentration, type = "l",
+     main = "CO2", xlab = "Year", ylab = "Concentration")
+
+plot(CH4$year, CH4$concentration, type = "l",
+     main = "CH4", xlab = "Year", ylab = "Concentration")
+
+plot(N2O$year, N2O$concentration, type = "l",
+     main = "N2O", xlab = "Year", ylab = "Concentration")
+
+par(mfrow = c(1, 1))  # reset layout
+
+fit3 <- lm(concentration ~ year * gas, data = greenhouse_gases)
+summary(fit3)
+```
+
+Analysis of greenhouse gas concentrations from 1–2000 CE revealed significant temporal trends that differed by gas type. Methane (CH4) exhibited a strong positive increase over time (CH4 slope = 0.138 per year and p < 0.001), whereas carbon dioxide (CO2) and nitrous oxide (N2O) had much lower baseline concentrations and minimal growth (CO2 adjusted slope = 0.009 per year; N2O adjusted slope = 0.008 per year; both p < 0.001). The interaction between year and gas was highly significant, indicating that the rate of increase varied across gases. Overall, the model explained 88% of the variance in concentrations (adjusted R-squared = 0.877), highlighting that CH4 has risen much more rapidly than CO2 or N2O over the past two millennia.
