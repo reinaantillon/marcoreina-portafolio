@@ -1,0 +1,64 @@
+# Description of the data
+The BEAM (Bacteria, Enterics, Amoeba, and Mycotics) Dashboard is an interactive tool to access and visualize data from the System for Enteric Disease Response, Investigation, and Coordination (SEDRIC). The BEAM Dashboard provides timely data on pathogen trends and serotype details to inform work to prevent illnesses from food and animal contact.
+Last updated: January 20, 2026
+Data provided by the Division of Foodborne, Waterborne, and Environmental Diseases (DFWED)
+
+License	Public Domain U.S. Government
+Source Link	https://www.usa.gov/government-works
+
+# Loading data
+```{r}
+library(here)
+cdcdata <- read.csv(here("cdcdata-exercise", "BEAM_Dashboard_-_Report_Data_20260211.csv"))
+```
+
+# Data exploration
+```{r}
+# get an overview of data structure
+str(cdcdata)
+
+# get a summary of data
+summary(cdcdata)
+```
+
+# Data cleaning
+```{r}
+#step 1 removing mostly empty columns
+cdcdata_1 <- subset(cdcdata, select = -c(Outbreak.associated.isolates, New.multistate.outbreaks, New.multistate.outbreaks...US, X..Isolates.with.clinically.important.antimicrobial.resistance, Number.of.sequenced.isolates.analyzed.by.NARMS))
+
+#step 2 dropping NA values
+cdcdata_2 <- na.omit(cdcdata_1)
+```
+
+# Data re-exploration
+```{r}
+# get an overview of data structure
+str(cdcdata_2)
+
+# get a summary of data
+summary(cdcdata_2)
+```
+
+# Number of isolates per year
+```{r}
+library(ggplot2)
+
+ggplot(cdcdata_2, aes(x = Year, fill = Pathogen)) + geom_bar() + theme_bw()
+
+ggplot(cdcdata_2, aes(x = Year)) + geom_bar(fill ="lightblue3") + theme_bw() + facet_wrap( ~ Pathogen, scales = "free")
+``` 
+
+# Trends by month
+```{r}
+ggplot(cdcdata_2, aes(x = Month, color = Year)) + geom_line(stat = "count") + theme_bw() + facet_wrap( ~ Pathogen, scales = "free")
+```
+
+# Comparing pathogens per state
+```{r}
+ggplot(cdcdata_2, aes(x = State, fill = Pathogen)) + geom_bar() + theme_bw() + facet_wrap(~ Pathogen, ncol = 1, scales = "free") + theme(axis.text.x = element_text(angle = 90), strip.text.x = element_blank(), legend.position = "top") 
+```
+
+# Source type
+```{r}
+ggplot(cdcdata_2, aes(x = Year, fill = Pathogen)) + geom_bar() + theme_bw() + facet_grid(Source.Type ~ Pathogen, scales = "free") + theme(legend.position = "none")
+```
