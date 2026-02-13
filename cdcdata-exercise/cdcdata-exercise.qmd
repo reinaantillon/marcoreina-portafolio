@@ -62,3 +62,118 @@ ggplot(cdcdata_2, aes(x = State, fill = Pathogen)) + geom_bar() + theme_bw() + f
 ```{r}
 ggplot(cdcdata_2, aes(x = Year, fill = Pathogen)) + geom_bar() + theme_bw() + facet_grid(Source.Type ~ Pathogen, scales = "free") + theme(legend.position = "none")
 ```
+
+
+# This part contibuted by Elle Adams
+
+Start with loading necessary packages 
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(purrr)
+library(ggplot2)
+library(lubridate)
+```
+
+Generating synthetic data, following outline from week 4B class content. 
+
+```{r}
+#Set seed for reproducibility
+set.seed(123)
+
+#Number of observations to generate. The BEAM data had over 200,000 rows. I do not need the synthetic data to have this many, I will start with 500 to see how it goes. 
+n_obs <- 500
+
+#Creating empty dataframe with placeholders
+syn_data <- data.frame(Year = character(n_obs), Month = integer(n_obs), State = character(n_obs), Source.Type = character(n_obs), Source.Site = character(n_obs), Pathogen = character(n_obs), Serotype.Species = character(n_obs), Number.of.isolates = integer(n_obs))
+
+#Variable 1: Year
+start_date <- ymd("2018-01-01")
+end_date   <- ymd("2026-02-12")
+
+random_dates <- sample(seq(start_date, end_date, by = "day"), n_obs, replace = TRUE)
+
+syn_data$Year <- year(random_dates)
+
+#Variable 2: Month 
+syn_data$Month <- month(random_dates)
+
+#Variable 3: State - after some online searching, there seems to be a number of ways to do this, least to most accurate, I think since I did the dates truly just random, I will do the same for the states. 
+syn_data$State <- sample(state.abb, n_obs, replace = TRUE)
+
+#Variable 4: Source.Type - start by identifying possible answers for the source type in the original dataset to use to populate synthetic dataset
+unique(cdcdata_2$Source.Type)
+
+syn_data$Source.Type <- map_chr(sample(c("Human", "Animal", "Food", "Environment"), n_obs, replace = TRUE), as.character)
+
+#Variable 5: Source.Site - same process as variable 4
+unique(cdcdata_2$Source.Site)
+
+syn_data$Source.Site <- map_chr(sample(c("Stool", "Urine", "Blood", "Other"), n_obs, replace = TRUE), as.character)
+
+#Variable 6: Pathogen - same process as variables 4 & 5 - ran into trouble and wouldn't populate the column like the previous ones did, googling said I don't actually need the map_chr function. 
+unique(cdcdata_2$Pathogen)
+
+syn_data$Pathogen <- sample(c("Campylobacter", "STEC", "Salmonella", "Shigella", "Vibrio"), n_obs, replace = TRUE) 
+
+#Variable 7: Serotype.Species - this one is different since it depends on varaible 6 - counting the number of combinations to start
+combo_count <- cdcdata_2 %>% count(Pathogen, Serotype.Species)
+###That's a lot, too many to type individually. Let's try this: 
+serotypes <- cdcdata_2 %>% distinct(Pathogen, Serotype.Species) %>% group_by(Pathogen) %>% summarise(Serotypes = list(Serotype.Species))
+###Asked ChatGPT for help with this joining step
+syn_data <- syn_data %>% left_join(serotypes, by = "Pathogen") %>% rowwise() %>% mutate(Serotype.Species = sample(Serotypes, 1)) %>% ungroup() %>% select(-Serotypes)
+
+#Variable 8: Number.of.isolates - making it between the max and min from the original datset
+max(cdcdata_2$Number.of.isolates)
+min(cdcdata_2$Number.of.isolates)
+
+syn_data$Number.of.isolates <- round(runif(n_obs, min = 1, max = 283), 1)
+
+#Check out the dataframe 
+head(syn_data)
+```
+
+Okay, that was more work than I expected, but now the synthetic dataframe exists and is filled. 
+
+Now to explore the data 
+
+```{r}
+#Following Marco's lead, number of isolates per year - The first one is a stacked bar graph for total isolates, colored by which pathogen. The second is separate graphs for each pathogen, showing the number of isolates for it each year. 
+ggplot(syn_data, aes(x = Year, fill = Pathogen)) + 
+    geom_bar()
+
+ggplot(syn_data, aes(x = Year)) + 
+    geom_bar() +
+    facet_wrap( ~ Pathogen, scales = "free")
+```
+
+For the stacked bar graph, the real data shows dominance by Salmonella species, whereas the synthetic data is much more evenly distributed. For the individual bar graphs, because I made the sclaes so different it is hard to tell proportionally how different the two are in terms of nnumber of isolates. But based on the first graph, I doubt thye are very similar at all. 
+
+```{r}
+#Next Marco did trends by month 
+syn_data$Year <- as.character(syn_data$Year)
+ggplot(syn_data, aes(x = Month, color = Year)) + 
+    geom_line(stat = "count") +
+    facet_wrap( ~ Pathogen, scales = "free")
+```
+
+Wow this is all over the place, again probably because it's just random, I didn't tell it anything about real world trends and populations (I don't know how I would do this). 
+
+```{r}
+#Next was comparing pathogens per state 
+ggplot(syn_data, aes(x = State, fill = Pathogen)) + 
+    geom_bar() +
+    facet_wrap(~ Pathogen, ncol = 1, scales = "free")
+```
+
+Random, again, of course. 
+
+```{r}
+#Last was source type
+ggplot(syn_data, aes(x = Year, fill = Pathogen)) + 
+    geom_bar() +
+    facet_grid(Source.Type ~ Pathogen, scales = "free")
+```
+
+Very different from the real data, likely due to seasonal trends, and bacterial behavior(like where they are often found, etc) that I didn't tell the code to account for. Again, I don't even know how one would do this. For a random sampling it honestly looks like they sampled among the 5 possible pathogens fairly evenly, which I guess it could look more like that since I told it to do 500 samples. 
