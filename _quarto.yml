@@ -18,6 +18,8 @@ website:
             file: data-exercise/data-exercise.qmd
           - text: "CDC Data Analysis Exercise"
             file: cdcdata-exercise\cdcdata-exercise.qmd
+          - text: "Presentation exercise"
+            file: presentation-exercise/presentation-exercise.qmd
     right:
       - icon: github 
         href: https://github.com/reinaantillon/marcoreina-portafolio

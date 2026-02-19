@@ -1,0 +1,32 @@
+{
+  "chart": {
+    "title": "Chicken meat production",
+    "subtitle": "Chicken meat production is measured in tonnes per year.",
+    "citation": "Food and Agriculture Organization of the United Nations (2025)",
+    "originalChartUrl": "https://ourworldindata.org/grapher/chicken-meat-production?v=1&csvType=full&useColumnShortNames=false&utm_source=chatgpt.com",
+    "selection": [
+      "Martinique",
+      "Uganda",
+      "World"
+    ]
+  },
+  "columns": {
+    "Meat, chicken | 00001058 || Production | 005510 || tonnes": {
+      "titleShort": "Chicken meat production",
+      "titleLong": "Chicken meat production - UN FAO",
+      "shortUnit": "t",
+      "unit": "tonnes",
+      "timespan": "1961-2023",
+      "type": "Numeric",
+      "owidVariableId": 1018691,
+      "shortName": "meat__chicken__00001058__production__005510__tonnes",
+      "lastUpdated": "2025-03-17",
+      "nextUpdate": "2026-03-17",
+      "citationShort": "Food and Agriculture Organization of the United Nations (2025) – with major processing by Our World in Data",
+      "citationLong": "Food and Agriculture Organization of the United Nations (2025) – with major processing by Our World in Data. “Chicken meat production – UN FAO” [dataset]. Food and Agriculture Organization of the United Nations, “Production: Crops and livestock products” [original data].",
+      "fullMetadata": "https://api.ourworldindata.org/v1/indicators/1018691.metadata.json"
+    }
+  },
+  "dateDownloaded": "2026-02-18",
+  "activeFilters": {}
+}

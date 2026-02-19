@@ -1,0 +1,196 @@
+# Presentation exercise
+
+Food and Agriculture Organization of the United Nations (2025) – with major processing by Our World in Data. “Chicken meat production – UN FAO” \[dataset\]. Food and Agriculture Organization of the United Nations, “Production: Crops and livestock products” \[original data\]. Retrieved February 18, 2026 from https://archive.ourworldindata.org/20260119-235736/grapher/chicken-meat-production.html (archived on January 19, 2026).
+
+```{r}
+# Loading used libraries
+library(ggplot2)
+library(maps)
+library(countries)
+library(dplyr)
+library(here)
+```
+
+```{r}
+# Loading data and exploring variables
+original_data <- read.csv(here("presentation-exercise/chicken-meat-production/chicken-meat-production.csv"))
+str(original_data)
+summary(original_data)
+```
+
+```{r}
+# Determining if entity is a country name
+original_data$is_country <- is_country(x = original_data$region)
+
+# Adding ISO code for all the countries
+original_data$iso_code <- country_name(x= original_data$region, to="ISO3")
+
+# Creating bins for chicken production: code fine-tuned with ChatGPT
+
+breaks_prod <- c(0, 100000, 200000, 500000, 1000000, 2000000, 5000000, 10000000, 100000000)
+
+# Mutating data to include bins: code fine-tuned with ChatGPT
+original_data <- original_data |>
+  mutate(
+    prod_bin = cut(
+      Chicken.meat.production,
+      breaks = breaks_prod,
+      include.lowest = TRUE,
+      right = FALSE
+    )
+  )
+
+# Changing bins names to categories: code fine-tuned with ChatGPT
+levels(original_data$prod_bin) <- c(
+  "0 – 100k t",
+  "100k – 200k t",
+  "200k – 500k t",
+  "500k – 1M t",
+  "1 – 2M t",
+  "2 – 5M t",
+  "5 – 10M t",
+  "> 10M t"
+)
+
+# Creating clean data vector and exploring variables
+clean_data <- subset(original_data, is_country == TRUE)
+str(clean_data)
+summary(clean_data)
+
+# Creating 2023 dataset, just to mimic the first plot shown
+data_2023 <- subset(clean_data, Year == 2023)
+```
+
+```{r}
+# Loading world map  and removing Antarctica
+world_map <- map_data("world") %>% 
+  filter(region != "Antarctica")
+
+# Adding ISO code for all the countries
+world_map$iso_code <- country_name(x= world_map$region, to="ISO3")
+
+# Merging dataframes based on the ISO code per country
+map_2023 <- left_join(world_map, data_2023, by = "iso_code")
+```
+
+# Chicken Production around the world 2023 (Recreated from FAO data)
+
+```{r}
+#| fig-width: 9
+#| fig-height: 5
+
+# Recreating plot for 2023: code fine-tuned with ChatGPT
+
+plot_2023 <- ggplot(map_2023, aes(long, lat, group = group, fill = prod_bin)) +
+  geom_polygon(color = "lightgrey", linewidth = 0.1) +
+    labs(fill = "Chicken production"
+  ) +
+  theme_void() +
+  theme(legend.position = "bottom") +
+  scale_fill_manual(values = c("#FFF5F0", "#FEE0D2", "#FCBBA1", "#FC9272", "#FB6A4A", "#EF3B2C", "#CB181D", "#99000D")
+  )
+ 
+plot_2023
+```
+
+# Creating a table using this same information
+
+ChatGPT prompt: "I want to make an interactive table for chicken consumption from around the world that integrates some graphs within the table, i have information from 1961 to 2023"
+
+### ChatGPT response:
+
+library(reactable) library(sparkline) library(dplyr) library(tidyr)
+
+```{r}
+# Loading suggested libraries by MR
+library(reactable)
+library(sparkline)
+library(tidyr)
+```
+
+### ChatGPT response:
+
+table_data \<- chicken_data %\>% group_by(country) %\>% summarise( latest_2023 = chicken_consumption\[year == 2023\], trend = list(chicken_consumption) )
+
+### Code adapted by MR
+
+```{r}
+clean_data <- clean_data %>%
+  mutate(
+    change = round(100 * (Chicken.meat.production - lag(Chicken.meat.production))/lag(Chicken.meat.production), 1)
+  )
+
+clean_data_table <- na.omit(clean_data)
+  
+table_chicken <- clean_data_table %>%
+  group_by(region) %>%
+  summarise(
+    latest_2023 = Chicken.meat.production[Year == 2023],
+    change = change[Year == 2023],
+    trend = list(Chicken.meat.production)
+  )
+
+```
+
+### ChatGPT response:
+
+reactable( table_data, columns = list( country = colDef(name = "Country"),
+       
+latest_2023 = colDef(
+  name = "Consumption (2023)",
+  format = colFormat(digits = 1)
+),
+
+trend = colDef(
+  name = "1961–2023 Trend",
+  cell = function(values) {
+    sparkline(values, type = "line")
+  },
+  html = TRUE
+)
+), searchable = TRUE, sortable = TRUE, highlight = TRUE, striped = TRUE )
+
+### Code adapted by MR
+
+```{r}
+reactable(
+  table_chicken,
+  columns = list(
+    region = colDef(name = "Country"),
+    
+    latest_2023 = colDef(
+      name = "2023 Production (t)",
+      format = colFormat(digits = 0),
+      defaultSortOrder = "desc"
+    ),
+    
+    change = colDef(
+      name = "2023 change (%)",
+      format = colFormat(digits = 1),
+      style = function(value) {
+        color <- if (value > 5) "green"
+        else if (value > -5) "black"
+        else "red"
+        list(
+          color = color,
+          fontWeight = "bold"
+        )
+      },
+    ),
+    
+    trend = colDef(
+      name = "Historic Trend",
+      cell = function(values) {
+        sparkline(values, type = "line")
+      },
+      html = TRUE
+    )
+  ),
+  searchable = TRUE,
+  sortable = TRUE,
+  highlight = TRUE,
+  striped = TRUE
+)
+```
+
+### Table shows the 2023 production and the change percentage compared to 2022. Conditional formatting is shown as black for for -5% to 5%, green for +5% and above, red for -5% and under. Table can be searched and sorted.
