@@ -1,0 +1,217 @@
+#Fitting exercise
+
+```{r}
+# Loading data
+library(here)
+data <- read.csv(here("fitting-exercise/", "Mavoglurant_A2121_nmpk.csv"))
+
+str(data)
+
+# Plotting DV ~ TIME
+library(ggplot2)
+ggplot(data, aes(y = DV, x = TIME)) + geom_point() + theme_bw()
+
+ggplot(data, aes(y = DV, x = TIME, color = as.factor(DOSE))) + geom_point() + theme_bw()
+
+ggplot(data, aes(y = DV, x = TIME, color = as.factor(DOSE))) + geom_point() + facet_wrap(~ DOSE) + theme_bw() + theme(strip.text = element_blank())
+```
+
+```{r}
+# Removing OCC = 2
+data_occ1 <- subset(data, OCC == 1)
+
+# Removing time = 0
+data_timefilter <-  subset(data_occ1, !(TIME == 0))
+
+# Data only with time zero
+data_timezero <-  subset(data_occ1, (TIME == 0))
+
+library(dplyr)
+# Summarizing - ChatGPT used for this code
+sum_dv <- data_occ1 %>%
+  filter(TIME != 0) %>%
+  group_by(ID) %>%
+  summarize(Y = sum(DV, na.rm = TRUE))
+
+# Merging datasets
+merged_data <- left_join(data_timezero, sum_dv, by = "ID")
+```
+
+```{r}
+# "Last" data cleaning
+data_clean <- data.frame(Y  = merged_data$Y,
+                        DOSE = merged_data$DOSE,
+                        AGE = merged_data$AGE,
+                        SEX = as.factor(merged_data$SEX),
+                        RACE = as.factor(merged_data$RACE),
+                        WT = merged_data$WT,
+                        HT = merged_data$HT)
+
+library(readr)
+write_csv(data_clean, here("fitting-exercise/", "data_clean.csv"))
+```
+
+```{r}
+# Plotting distributions for each one of the variables
+hist(data_clean$Y) # Normally distirbuted, slight right skew
+hist(data_clean$DOSE) # 3 doses used, will move to as.factor for certain plots
+hist(data_clean$AGE) # few observation in 30-35 bin 
+plot(data_clean$SEX) # sex 1 overrepresented
+plot(data_clean$RACE) # Race 7 underrepresented
+hist(data_clean$WT) # Normally distributed
+hist(data_clean$HT) # Normally distributed
+```
+
+```{r}
+# First round of plots
+ggplot(data_clean, aes(y = Y, x = as.factor(DOSE))) + geom_boxplot() + theme_bw() # Hihgher dose, higher Y
+
+ggplot(data_clean, aes(y = Y, x = AGE)) + geom_point() + theme_bw() # No clear pattern observed
+
+ggplot(data_clean, aes(y = Y, x = SEX)) + geom_boxplot() + theme_bw() # Similar distributuion of SEX 1 and 2
+
+ggplot(data_clean, aes(y = Y, x = RACE)) + geom_boxplot() + theme_bw() #Similar distribution for RACE 1, 2, 7, and 88
+
+ggplot(data_clean, aes(y = Y, x = WT)) + geom_point() + theme_bw() # No clear pattern observed
+
+ggplot(data_clean, aes(y = Y, x = HT)) + geom_point() + theme_bw() # No clear pattern observed
+
+```
+
+```{r}
+# Second round of plots
+ggplot(data_clean, aes(y = Y, x = as.factor(DOSE), levels =  SEX, fill = SEX)) + geom_boxplot() + theme_bw() # DOSE = 37.5 has wider distribution for SEX = 1
+
+ggplot(data_clean, aes(y = Y, x = as.factor(DOSE), levels =  RACE, fill = RACE)) + geom_boxplot() + theme_bw() # DOSE = 37.5 has no representation of RACE = 7 and 88
+
+ggplot(data_clean, aes(y = Y, x = WT, color = SEX)) + geom_point(size = 3) + theme_bw() + facet_wrap(~ SEX) + theme(strip.text = element_blank()) # SEX = 2 underrepresented as mentioned before, weight is less than SEX = 1
+
+ggplot(data_clean, aes(y = Y, x = HT, color = RACE)) + geom_point(size = 3) + theme_bw() + facet_wrap(~ RACE) + theme(strip.text = element_blank()) # Only two observations of RACE = 7, very few observations of RACE = 88
+
+ggplot(data_clean, aes(y = Y, x = WT, color = AGE, size = AGE)) + geom_point(alpha = 0.75) + theme_bw() # No clear pattern observed
+
+ggplot(data_clean, aes(y = Y, x = HT, color = AGE, size = AGE)) + geom_point(alpha = 0.75) + theme_bw() # No clear pattern observed
+
+```
+
+```{r}
+library(tidymodels)
+library(dotwhisker)
+
+#Loading engine for lm
+linear_reg() %>% 
+  set_engine("keras")
+
+# Making first lm fit based on tidymodels, Y ~ DOSE
+lm_mod1 <- linear_reg()
+
+lm_fit1 <- 
+  lm_mod1 %>% 
+  fit(Y ~ DOSE, data = data_clean)
+
+# Predictions: from ChatGPT
+pred_lm1 <- predict(lm_fit1, data_clean) %>%
+  bind_cols(data_clean)
+
+# Metrics: from ChatGPT
+metrics(pred_lm1, truth = Y, estimate = .pred)
+
+# Creating table of coefficients
+tidy(lm_fit1)
+
+# Plotting first fit
+tidy(lm_fit1) %>% 
+  dwplot(dot_args = list(size = 2, color = "black"),
+         whisker_args = list(color = "black"),
+         vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2))
+
+```
+
+```{r}
+# Making second lm fit based on tidymodels, Y ~ DOSE + AGE + SEX + RACE + WT + HT
+lm_mod2 <- linear_reg()
+
+lm_fit2 <- 
+  lm_mod2 %>% 
+  fit(Y ~ DOSE + AGE + SEX + RACE + WT + HT, data = data_clean)
+
+# Predictions: from ChatGPT
+pred_lm2 <- predict(lm_fit2, data_clean) %>%
+  bind_cols(data_clean)
+
+# Metrics: from ChatGPT
+metrics(pred_lm2, truth = Y, estimate = .pred)
+
+# Creating table of coefficients
+tidy(lm_fit2)
+
+# Plotting second fit
+tidy(lm_fit2) %>% 
+  dwplot(dot_args = list(size = 2, color = "black"),
+         whisker_args = list(color = "black"),
+         vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2))
+```
+
+```{r}
+#Loading engine for glm
+logistic_reg() %>% 
+  set_engine("glm")
+
+# Making first glm fit based on tidymodels, Y ~ DOSE
+log_mod1 <- logistic_reg() 
+
+log_fit1 <- 
+  log_mod1 %>% 
+  fit(SEX ~ DOSE, data = data_clean)
+
+# Predictions
+pred_log1 <- predict(log_fit1, data_clean, type = "prob") %>%
+  bind_cols(predict(log_fit1, data_clean)) %>%
+  bind_cols(data_clean)
+
+# Metrics
+accuracy(pred_log1, truth = SEX, estimate = .pred_class)
+roc_auc(pred_log1, truth = SEX, .pred_1)
+
+# Creating table of coefficients
+tidy(log_fit1)
+
+# Plotting second fit
+tidy(log_fit1) %>% 
+  dwplot(dot_args = list(size = 2, color = "black"),
+         whisker_args = list(color = "black"),
+         vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2))
+
+```
+
+```{r}
+# Making second glm fit based on tidymodels, Y ~ DOSE + AGE + SEX + RACE + WT + HT
+log_mod2 <- logistic_reg()  
+
+log_fit2 <- 
+  log_mod2 %>% 
+  fit(SEX ~ DOSE + AGE + RACE + WT + HT, data = data_clean)
+
+# Predictions
+pred_log2 <- predict(log_fit2, data_clean, type = "prob") %>%
+  bind_cols(predict(log_fit2, data_clean)) %>%
+  bind_cols(data_clean)
+
+# Metrics
+accuracy(pred_log2, truth = SEX, estimate = .pred_class)
+roc_auc(pred_log2, truth = SEX, .pred_1)
+
+# Creating table of coefficients
+tidy(log_fit2)
+
+# Plotting second fit
+tidy(log_fit2) %>% 
+  dwplot(dot_args = list(size = 2, color = "black"),
+         whisker_args = list(color = "black"),
+         vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2))
+```
+
+# The only worthly pattern I observed was the higher dose and higher 
+# The data was very skewed in certain categories like sex and race, Also there might be two possible age groups.
+# However it is hard to know whatg we are looking atg if I can not make a connection between them. 
+# Other than that, for the log model height it was linked to sex, which it kinda makes sense as height differs between male and females but no other predictor was significant
