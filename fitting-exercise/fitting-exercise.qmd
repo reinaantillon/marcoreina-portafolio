@@ -211,7 +211,99 @@ tidy(log_fit2) %>%
          vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2))
 ```
 
-# The only worthly pattern I observed was the higher dose and higher 
-# The data was very skewed in certain categories like sex and race, Also there might be two possible age groups.
-# However it is hard to know whatg we are looking atg if I can not make a connection between them. 
-# Other than that, for the log model height it was linked to sex, which it kinda makes sense as height differs between male and females but no other predictor was significant
+#### The only worthly pattern I observed was the higher dose and higher 
+#### The data was very skewed in certain categories like sex and race, Also there might be two possible age groups.
+#### However it is hard to know whatg we are looking atg if I can not make a connection between them. 
+#### Other than that, for the log model height it was linked to sex, which it kinda makes sense as height differs between male and females but no other predictor was significant
+
+
+# MODULE 10
+#### starts here
+
+```{r}
+data_clean2 <- data.frame("Y" = data_clean$Y, 
+"DOSE" = data_clean$DOSE, 
+"AGE" = data_clean$AGE, 
+"SEX" = data_clean$SEX, 
+"WT" = data_clean$WT, 
+"HT" = data_clean$HT
+)
+
+rngseed = 1234
+set.seed(rngseed)
+
+# Put 3/4 of the data into the training set 
+data_split <- initial_split(data_clean2, prop = 0.75)
+
+# Create data frames for the two sets:
+train_data <- training(data_split)
+test_data  <- testing(data_split)
+```
+
+
+```{r}
+new_model_null <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Y ~ 1, train_data)
+
+tidy(new_model_null)
+
+new_model1 <-  linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Y ~ DOSE, data = train_data)
+tidy(new_model1)
+
+new_model2 <-   linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Y ~ DOSE + AGE + SEX + WT + HT, data = train_data)
+tidy(new_model2)
+
+```
+
+
+```{r}
+# Function to calculate RMSE
+calc_rmse <- function(model, data) {
+  predictions <- predict(model, new_data = data)
+  actual <- data$Y
+  sqrt(mean((actual - predictions$.pred)^2))
+}
+
+# Apply to each model
+rmse_null <- calc_rmse(new_model_null, data_clean2)
+rmse_model1 <- calc_rmse(new_model1, data_clean2)
+rmse_model2 <- calc_rmse(new_model2, data_clean2)
+
+```
+
+
+```{r}
+set.seed(rngseed)
+folds <- vfold_cv(data_clean2, v = 10)
+folds
+
+# First CV
+new_model1_cv <- fit_resamples(
+  linear_reg() %>% 
+  set_engine("lm"),
+  Y ~ DOSE,
+  resamples = folds,
+  metrics = metric_set(rmse)
+)
+
+# Second CV
+new_model2_cv <- fit_resamples(
+  linear_reg() %>% 
+  set_engine("lm"),
+  Y ~ DOSE + AGE + SEX + WT + HT,
+  resamples = folds,
+  metrics = metric_set(rmse)
+)
+
+# Print CV results
+res_cv_model1 <- collect_metrics(new_model1_cv)
+res_cv_model2 <- collect_metrics(new_model2_cv)
+
+res_cv_model1
+res_cv_model2
+```
