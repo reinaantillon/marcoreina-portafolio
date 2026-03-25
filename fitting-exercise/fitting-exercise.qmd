@@ -262,17 +262,22 @@ tidy(new_model2)
 
 
 ```{r}
-# Function to calculate RMSE
-calc_rmse <- function(model, data) {
-  predictions <- predict(model, new_data = data)
-  actual <- data$Y
-  sqrt(mean((actual - predictions$.pred)^2))
-}
+#RMSE null
+avg_resoonse <- mean(train_data$Y)
+rmse_null_model <- sqrt(mean((train_data$Y - avg_resoonse)^2))
+rmse_null_model
 
-# Apply to each model
-rmse_null <- calc_rmse(new_model_null, data_clean2)
-rmse_model1 <- calc_rmse(new_model1, data_clean2)
-rmse_model2 <- calc_rmse(new_model2, data_clean2)
+# RSME1
+predict_new1 <- predict(new_model1, train_data) %>%
+  bind_cols(train_data)
+rmse_model1 <- rmse(predict_new1, truth = Y, estimate = .pred)
+rmse_model1
+
+#RMSE 2
+predict_new2 <- predict(new_model2, train_data) %>%
+  bind_cols(train_data)
+rmse_model2 <- rmse(predict_new2, truth = Y, estimate = .pred)
+rmse_model2
 
 ```
 
@@ -300,7 +305,7 @@ new_model2_cv <- fit_resamples(
   metrics = metric_set(rmse)
 )
 
-# Print CV results
+# results
 res_cv_model1 <- collect_metrics(new_model1_cv)
 res_cv_model2 <- collect_metrics(new_model2_cv)
 
