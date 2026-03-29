@@ -312,3 +312,144 @@ res_cv_model2 <- collect_metrics(new_model2_cv)
 res_cv_model1
 res_cv_model2
 ```
+
+# Code made by MR
+#### (I contributed to other repo and waited but did not recieved the pull request from the other person, so I am pasting the code I contributed to them but I adapted it to mine)
+
+```{r}
+# This section added by MARCO REINA
+
+#PART 2
+#predicted values
+data_clean2 <- data_clean2 %>%
+  mutate(
+    pred_null = predict(new_model_null, new_data = data_clean2, type = "numeric")$.pred,
+    pred_mod1 = predict(new_model1, new_data = data_clean2, type = "numeric")$.pred,
+    pred_mod2 = predict(new_model2, new_data = data_clean2, type = "numeric")$.pred
+  )
+
+```
+
+
+```{r}
+# Create a long-format data frame for plotting
+pred_long_format <- data_clean2 %>%
+  select(Y, pred_null, pred_mod1, pred_mod2) %>%
+  pivot_longer(
+    cols = starts_with("pred_"),
+    names_to = "model",
+    values_to = "prediction"
+  ) %>%
+  # Clean up model labels for nicer legend
+  mutate(
+    model = case_when(
+      model == "pred_null" ~ "Null Model",
+      model == "pred_mod1" ~ "Model 1 (DOSE)",
+      model == "pred_mod2" ~ "Model 2 (Full)",
+      TRUE ~ model
+    )
+  )
+```
+
+```{r}
+# Plotting observed vs predicted
+ggplot(pred_long_format, aes(x = Y, y = prediction, color = model, shape = model)) +
+  geom_point(alpha = 0.6, size = 1.5) +
+  geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+  scale_x_continuous(limits = c(0, 6000)) + # englarged to 6000 because there were values outside the plot
+  scale_y_continuous(limits = c(0, 6000)) + # englarged to 6000 because there were values outside the plot
+  coord_fixed(ratio = 1) +  # Ensures 45° line appears at true 45°
+  labs(
+    title = "Observed vs. Predicted Values by Model",
+    x = "Observed Values",
+    y = "Predicted Values",
+    color = "Model",
+    shape = "Model"
+  ) +
+  theme_bw() +
+  theme(
+    panel.grid.minor = element_blank(),
+    legend.position = "bottom"
+  ) +
+  facet_wrap(~ factor(model,
+  levels = c("Null Model", "Model 1 (DOSE)", "Model 2 (Full)")))
+```
+
+
+```{r}
+#Plotting residuals
+data_clean2$residuals_mod2 <- data_clean2$pred_mod2 - data_clean2$Y
+
+ggplot(data_clean2, aes(x = Y, y = residuals_mod2)) + 
+  geom_point() +
+  geom_abline(slope = 0, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+  ylim(-2000, 2000) + #only 1 value left out to make it more visible
+  theme_bw() 
+
+```
+
+```{r}
+set.seed(rngseed) #seed set as rngseed
+
+# Create 100 bootstrap samples from training data
+dat_bs <- bootstraps(train_data, times = 100) 
+
+num_obs <- nrow(train_data)
+pred_bs <- matrix(NA, nrow = 100, ncol = num_obs)
+
+for (i in 1:100) {
+  # Get the i-th bootstrap sample
+  dat_sample <- rsample::analysis(dat_bs$splits[[i]])
+  
+  # Fit the model (Model 2: all predictors) to this sample
+  bs_fit <- linear_reg() |> 
+    set_engine("lm") |> 
+    fit(Y ~ DOSE + AGE + SEX + WT + HT, data = dat_sample)
+  
+  # Predict for the ORIGINAL training data
+  # Use pull(.pred) to get a numeric vector instead of a dataframe
+  pred_bs[i, ] <- predict(bs_fit, new_data = dat_sample) |> pull(.pred)
+}
+
+preds <- pred_bs |> apply(2, quantile, c(0.055, 0.5, 0.945)) |> t()
+```
+
+```{r}
+# Get the original predictions from the Model 2 fit on training data
+
+aug_train <- augment(new_model2, new_data = train_data)
+
+# Combine with the bootstrap results (the 'preds' matrix from the previous step)
+# This assumes 'preds' has columns for 5.5%, 50%, and 94.5% quantiles
+plot_data <- aug_train |>
+  mutate(
+    bs_low = preds[, 1],
+    bs_med = preds[, 2],
+    bs_high = preds[, 3]
+  )
+```
+
+
+```{r}
+#Plotting the bootstrap results
+
+ggplot(plot_data, aes(x = Y)) +
+  # 45-degree reference line (Ideal model)
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "grey50") +
+  # Bootstrap intervals (Upper and Lower bounds)
+  geom_errorbar(aes(ymin = bs_low, ymax = bs_high), color = "skyblue", alpha = 0.5) +
+  # Bootstrap median
+  geom_point(aes(y = bs_med), color = "blue", size = 1, alpha = 0.6) +
+  # Original point estimate (Original predictions)
+  geom_point(aes(y = .pred), color = "black", shape = 1, size = 2) +
+  # Formatting
+  labs(
+    x = "Observed Values",
+    y = "Predicted Values (Point & Bootstrap Bounds)",
+    title = "Observed vs. Predicted with Bootstrap Uncertainty"
+  ) +
+  # Ensure x and y axes are on the same scale
+  coord_obs_pred() + 
+  theme_bw()
+```
+
