@@ -326,3 +326,5 @@ rf_results_cv <- rf_tune_cv %>%
 rf_tune_cv %>% autoplot() + theme_bw()
 
 ```
+
+When we switch to cross-validation, the RMSE for both models goes up. Without CV. Cross-validation gives us a much more realistic picture by repeatedly training the model on different slices of the data and testing it on the parts it hasn’t seen. This process  penalizes overfitting and shows us how well each model will actually perform on new, unseen data.
