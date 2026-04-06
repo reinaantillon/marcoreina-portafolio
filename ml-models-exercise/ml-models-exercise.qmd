@@ -1,0 +1,328 @@
+```{r}
+#Assessment module 11
+
+#Load packages
+library(tidymodels)
+library(ggplot2)
+library(here)
+library(glmnet)
+library(ranger)
+
+#Set seed
+rngseed = 1234
+set.seed(rngseed)
+```
+
+
+```{r}
+#Load data
+data <- readRDS(here("ml-models-exercise/", "data_clean.rds"))
+
+#Race category adjustment
+data <- data %>%
+  mutate(RACE = case_when(
+    RACE == 1 ~ 1,
+    RACE == 2 ~ 2,
+    RACE %in% c(7, 88) ~ 3,
+  ))
+
+#Race possible categories bases on manuscript
+data <- data %>%
+  mutate(RACE_cat = case_when(
+    RACE == 1 ~ "caucasian",
+    RACE == 2 ~ "non-caucasian",
+    RACE == 3 ~ "undisclosed"
+  ))
+
+```
+
+```{r}
+#Correlation plots for continuous variables
+data_continuous <- data.frame("Y" = data$Y, 
+#"DOSE" = data$DOSE, dose variable removed
+"WT" = data$WT, 
+"HT" = data$HT
+)
+
+#Pairwise comparison
+pairs(data_continuous)
+
+#Correlation matrix
+cor(data_continuous)
+
+#New feature BMI
+data$BMI <- (data$WT/(data$HT^2))
+```
+
+```{r}
+#Creating 3 models
+
+#Linear regression
+model1 <- linear_reg() %>%
+  set_engine("lm") %>% 
+  fit(Y ~ DOSE + AGE + SEX + WT + HT, data = data)
+
+#LASSO
+model2 <- linear_reg(penalty = 0.1) %>%
+  set_engine("glmnet") %>% 
+  fit(Y ~ DOSE + AGE + SEX + WT + HT, data = data)
+
+#Random forest
+model3 <- rand_forest(mode = "regression") %>% 
+  set_engine("ranger", seed = rngseed) %>% 
+  fit(Y ~ DOSE + AGE + SEX + WT + HT, data = data)
+
+```
+
+```{r}
+#Predictions for each model
+pred1 <- predict(model1, new_data = data) 
+pred2 <- predict(model2, new_data = data)
+pred3 <- predict(model3, new_data = data) 
+
+#Adding predictions into data
+data <- data %>%
+  mutate(
+    pred1 = predict(model1, new_data = data, type = "numeric")$.pred,
+    pred2 = predict(model2, new_data = data, type = "numeric")$.pred,
+    pred3 = predict(model3, new_data = data, type = "numeric")$.pred
+  )
+
+#RSME values for each model
+rmse(data, truth = Y, estimate = pred1)
+rmse(data, truth = Y, estimate = pred2)
+rmse(data, truth = Y, estimate = pred3)
+
+```
+
+```{r}
+#Plotting predicted vs observed
+
+#Model1
+ggplot(data, aes(y = Y, x = pred1)) +
+    geom_point() +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(0, 6000), y = c(0, 6000)) +
+    theme_bw()
+
+#Model2
+ggplot(data, aes(y = Y, x = pred2)) +
+    geom_point() +
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(0, 6000), y = c(0, 6000)) +
+    theme_bw()
+
+#Model3
+ggplot(data, aes(y = Y, x = pred3)) + 
+    geom_point() + 
+    geom_abline(slope = 1, intercept = 0, color = "gray50", linewidth = 0.8, linetype = "dashed") +
+    lims(x = c(0, 6000), y = c(0, 6000)) +
+    theme_bw()
+```
+
+
+```{r}
+#LASSO model tuning
+
+#set specs
+lasso_model <- linear_reg(penalty = tune(), mixture = 1) %>%
+  set_engine("glmnet")
+
+#set recipe
+lasso_recipe <- recipe(Y ~ DOSE + AGE + SEX + WT + HT, data = data) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_numeric_predictors(), -all_outcomes())
+
+#establish workflow using specs and recipe
+lasso_workflow <- workflow() %>%
+  add_model(lasso_model) %>%
+  add_recipe(lasso_recipe)
+
+#create penalty grid
+lasso_grid <- tibble(
+  penalty = 10^seq(-5, 2, length.out = 50)
+)
+
+#resampling with apparent()
+lasso_app <- apparent(data)
+
+#reset seed
+set.seed(rngseed)
+
+#Lasso grid tune object
+lasso_tune <- tune_grid(
+  lasso_workflow,
+  resamples = lasso_app,
+  grid = lasso_grid,
+  metrics = metric_set(rmse),
+  control = control_grid(save_pred = TRUE)
+)
+
+#print predictions
+collect_predictions(lasso_tune)
+
+#plot manually, autoplot() did not work
+lasso_tune %>%
+    collect_metrics(summarize = FALSE) %>%
+    filter(.metric == "rmse") %>%
+    ggplot(aes(x = log(penalty, base = 10), y = .estimate)) +
+    geom_line() + 
+    geom_point() +
+    labs(
+        x = "Penalty",
+        y = "RMSE"
+    )+
+    theme_bw()
+```
+
+As the penalty increases, LASSO shrinks coefficients and reduces model flexibility, introducing bias and increasing RMSE; since linear regression is the unpenalized optimum, LASSO cannot achieve a lower RMSE than the linear model when evaluated on the training data.
+
+```{r}
+#tuning RF model
+
+#model specs
+rf_model <- rand_forest(
+  mode = "regression",
+  mtry = tune(),
+  min_n = tune(),
+  trees = 300
+) %>%
+  set_engine("ranger", seed = rngseed)
+
+#model workflow
+rf_workflow <- workflow() %>%
+  add_model(rf_model) %>%
+  add_recipe(lasso_recipe)  # reuse recipe
+
+#model grid
+rf_grid <- grid_regular(
+  mtry(range = c(1, 7)),
+  min_n(range = c(1, 21)),
+  levels = 7
+)
+
+#RF tuning
+rf_tune <- tune_grid(
+  rf_workflow,
+  resamples = apparent(data),
+  grid = rf_grid,
+  metrics = metric_set(rmse),
+  control = control_grid(save_pred = TRUE)
+)
+
+#print predictions
+collect_predictions(rf_tune)
+
+#Collecting RMSE from rf tune
+rf_results <- rf_tune %>%
+  collect_metrics(summarize = FALSE) %>%
+  filter(.metric == "rmse")
+
+#plot manually, autoplot() did not work
+ggplot(rf_results, aes(x = as.factor(mtry), y = as.factor(min_n), fill = .estimate)) +
+  geom_tile() +
+  labs(
+    x = "mtry",
+    y = "min_n",
+    fill = "RMSE"
+  ) +
+  theme_bw()
+```
+
+### Repeating with CV
+
+```{r}
+# Set the seed 
+set.seed(rngseed)
+
+# Create the 5-fold CV, repeated 5 times
+resamples_cv <- vfold_cv(data, v = 5, repeats = 5)
+```
+
+```{r}
+#LASSO model tuning with CV
+
+#set specs
+lasso_model_cv <- linear_reg(penalty = tune(), mixture = 1) %>%
+  set_engine("glmnet")
+
+#set recipe
+lasso_recipe_cv <- recipe(Y ~ DOSE + AGE + SEX + WT + HT, data = data) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_numeric_predictors(), -all_outcomes())
+
+#establish workflow using specs and recipe
+lasso_workflow_cv <- workflow() %>%
+  add_model(lasso_model_cv) %>%
+  add_recipe(lasso_recipe_cv)
+
+#create penalty grid
+lasso_grid_cv <- tibble(
+  penalty = 10^seq(-5, 2, length.out = 50)
+)
+
+#reset seed
+set.seed(rngseed)
+
+#Lasso grid tune object
+lasso_tune_cv <- tune_grid(
+  lasso_workflow_cv,
+  resamples = resamples_cv,
+  grid = lasso_grid,
+  metrics = metric_set(rmse),
+  control = control_grid(save_pred = TRUE)
+)
+
+#print predictions
+collect_predictions(lasso_tune_cv)
+
+#plotting with autoplot
+lasso_tune_cv %>% autoplot() + theme_bw()
+```
+
+
+```{r}
+#tuning RF model with CV
+
+#model specs
+rf_model_cv <- rand_forest(
+  mode = "regression",
+  mtry = tune(),
+  min_n = tune(),
+  trees = 300
+) %>%
+  set_engine("ranger", seed = rngseed)
+
+#model workflow
+rf_workflow_cv <- workflow() %>%
+  add_model(rf_model) %>%
+  add_recipe(lasso_recipe)  # reuse recipe
+
+#model grid
+rf_grid_cv <- grid_regular(
+  mtry(range = c(1, 7)),
+  min_n(range = c(1, 21)),
+  levels = 7
+)
+
+#RF tuning
+rf_tune_cv <- tune_grid(
+  rf_workflow,
+  resamples = resamples_cv,
+  grid = rf_grid,
+  metrics = metric_set(rmse),
+  control = control_grid(save_pred = TRUE)
+)
+
+#print predictions
+collect_predictions(rf_tune_cv)
+
+#Collecting RMSE from rf tune
+rf_results_cv <- rf_tune_cv %>%
+  collect_metrics(summarize = FALSE) %>%
+  filter(.metric == "rmse")
+
+#plotting with autoplot
+rf_tune_cv %>% autoplot() + theme_bw()
+
+```

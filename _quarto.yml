@@ -22,6 +22,8 @@ website:
             file: presentation-exercise/presentation-exercise.qmd
           - text: "Fitting exercise"
             file: fitting-exercise/fitting-exercise.qmd
+          - text: "ML exercise 1"
+            file: ml-models-exercise/ml-models-exercise.qmd
     right:
       - icon: github 
         href: https://github.com/reinaantillon/marcoreina-portafolio

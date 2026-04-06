@@ -49,6 +49,8 @@ data_clean <- data.frame(Y  = merged_data$Y,
 
 library(readr)
 write_csv(data_clean, here("fitting-exercise/", "data_clean.csv"))
+
+saveRDS(data_clean, here("ml-models-exercise/", "data_clean.rds"))
 ```
 
 ```{r}
