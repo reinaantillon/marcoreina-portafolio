@@ -302,32 +302,32 @@ trends_df$spread_log2 <- log(trends_df$spreadkm, base = exp(2)) + 1
 #Creating a null linear model
 lm_null <- linear_reg() %>%
   set_engine("lm") %>% 
-  fit(spread_log2 ~ 1, data = trends_df)
+  fit(spreadkm ~ 1, data = trends_df)
 
 #Including all variables and a stepwise approach (reverse)
 lm_fit1 <- linear_reg() %>%
   set_engine("lm") %>% 
-  fit(spread_log2 ~ wave + season + year + month + count + lat_bin + lon_bin, data = trends_df)
+  fit(spreadkm ~ wave + season + year + month + count + lat_bin + lon_bin, data = trends_df)
 
 lm_fit2 <- linear_reg() %>%
   set_engine("lm") %>% 
-  fit(spread_log2 ~ wave + season + year + month + lat_bin + lon_bin, data = trends_df)
+  fit(spreadkm ~ wave + season + year + month + lat_bin + lon_bin, data = trends_df)
 
 lm_fit3 <- linear_reg() %>%
   set_engine("lm") %>% 
-  fit(spread_log2 ~ wave + season + year + lat_bin + lon_bin, data = trends_df)
+  fit(spreadkm ~ wave + season + year + lat_bin + lon_bin, data = trends_df)
 
 lm_fit4 <- linear_reg() %>%
   set_engine("lm") %>% 
-  fit(spread_log2 ~ wave + season + lat_bin + lon_bin, data = trends_df)
+  fit(spreadkm ~ wave + season + lat_bin + lon_bin, data = trends_df)
 
 lm_fit5 <- linear_reg() %>%
   set_engine("lm") %>% 
-  fit(spread_log2 ~ season, data = trends_df)
+  fit(spreadkm ~ season, data = trends_df)
 
 lm_fit6 <- linear_reg() %>%
   set_engine("lm") %>% 
-  fit(spread_log2 ~ wave, data = trends_df)
+  fit(spreadkm ~ wave, data = trends_df)
 
 ```
 
@@ -388,6 +388,24 @@ ggplot(trends_df, aes(x = spreadkm, y = pred6)) +
     theme_bw()
 ```
 
+### Checking the residuals
+
+```{r}
+ggplot(trends_df, aes(x = spreadkm, y = res0)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(trends_df, aes(x = spreadkm, y = res1)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+
+ggplot(trends_df, aes(x = spreadkm, y = res2)) +
+    geom_point(size = 1, alpha = 0.5) +
+    theme_bw()
+```
+
+
+### Well while the models are not perfect,  let's compare them
 
 ```{r}
 
