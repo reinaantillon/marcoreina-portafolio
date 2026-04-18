@@ -1,5 +1,5 @@
-# TidyTuesday exercise by MR
-```{r}
+#
+#
 #Loading the TidyTuesday library and data
 
 library(tidytuesdayR)
@@ -16,11 +16,11 @@ tuesdata <- tidytuesdayR::tt_load('2026-04-14')
 birds <- tuesdata$birds
 #sea_states <- tuesdata$sea_states #Not necessary for my analysis
 ships <- tuesdata$ships
-```
-
-# EDA
-
-```{r}
+#
+#
+#
+#
+#
 # I took a look at the datasets in Positron and the Data Dictionary
 # I am interested in understanding seasonal changes in birds sightings
 
@@ -72,18 +72,18 @@ ships$census_method = NULL
 ships$hemisphere = NULL
 ships$activity = NULL
 
-```
-
-### Let's merge both datasets
-
-```{r}
+#
+#
+#
+#
+#
 merged_df <- left_join(birds, ships, by = "record_id")
 
 saveRDS(merged_df, here("tidytuesday-exercise/tidytuesday_df.rds"))
-```
-
-### Let's make a some new features and summary table
-```{r}
+#
+#
+#
+#
 merged_df <- merged_df %>%
     mutate(
         aggr_spc = 1 + str_count(species_scientific_name, "/"),
@@ -107,26 +107,26 @@ summary_genus <- merged_df %>%
 
 summary_genus %>%
     ggplot(aes(x = genus, y = count)) + geom_col() + coord_flip()
-```
-
-##### Seems like Diomeda is the genus with the majority of observations, I am going to focus on that. I would be interested to understand if thera are any trends I would like to focus on
-
-```{r}
+#
+#
+#
+#
+#
 merged_df %>%
     filter(genus_code == "DIO") %>%
     ggplot(aes(x = year, y = count, fill = as.factor(aggr_spc))) + 
     geom_col()
-```
-
-#### It seems the major Genus observed it is observed as aggregated species (probably not fully distinguisable from afar to the osberver) 
-
-#### Majority of the times Diomedea is either described into 2 species because both of them are very similar
-
-#### Additionally sightings have two different time frames (before and after  1983)
-
-### Let's see how frequent the sighting were in a map: all sightings from DIO
-
-```{r}
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 # Get world map data
 world_map <- map_data("world")
 
@@ -144,10 +144,10 @@ merged_df %>%
   coord_quickmap(xlim = c(50, 180), ylim = c(-75, -25)) +
   theme_bw()
 
-```
-
-### Now let's look how it the two previous groups (before and after 1983) had different behaviors
-```{r}
+#
+#
+#
+#
 #Sightings before 1983
 merged_df %>%
   filter(genus_code == "DIO", year <= 1983) %>%
@@ -176,12 +176,12 @@ merged_df %>%
   coord_quickmap(xlim = c(50, 180), ylim = c(-75, -25)) + 
   theme_bw()
 
-```
-
-#### Ok, from this information, I can see there are trends from each "wave" are differents (before and after 1983)
-
-#### Let's keep looking, now within each of the "waves" per season.
-```{r}
+#
+#
+#
+#
+#
+#
 #Sightings before 1983 per season
 merged_df %>%
   filter(genus_code == "DIO", year <= 1983) %>%
@@ -197,9 +197,9 @@ merged_df %>%
   theme_bw() +
   facet_wrap(~season)
 
-```
-
-```{r}
+#
+#
+#
 #Sightings after 1983 per season
 merged_df %>%
   filter(genus_code == "DIO", year > 1983) %>%
@@ -214,11 +214,11 @@ merged_df %>%
   coord_quickmap(xlim = c(50, 180), ylim = c(-75, -25)) +
   theme_bw() +
   facet_wrap(~season)
-```
-
-#### It seems there is also a seasonal effect, we will take this into account for modeling
-
-```{r}
+#
+#
+#
+#
+#
 #Let's create the dataset of interest
 trends_df <- merged_df %>%
   filter(genus_code == "DIO") %>%
@@ -235,17 +235,17 @@ freq_df <- trends_df %>%
     arrange(desc(count))
 
 freq_df
-```
-
-### From this information we can see the most "common" coordinates for sightings for DIO is 150, -40 with 7749 birds observed there.
-
-### I am going to use this to measure "spread" I will use this as my base coordinate group and measure the distance between this high frequency coordinate to the actual
-
-# ANALYSIS: 
-### Hypothesis: The spread of DIO is greater in warmer months than in cold months/seasons. 
-### Question: Is the spread getting smaller over the years?
-
-```{r}
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 #Let's calculate distance
 
 #Setting the main coordinate bins
@@ -273,11 +273,11 @@ DIO_df <- DIO_df %>%
     spread_rounded = round(spreadkm/10, digits = 0) * 10,
     wave = if_else(year >1983, 2, 1)
   ) 
-```
-
-### After creating the spread indicator, I am creating histograms to understand trends
-  
-```{r}
+#
+#
+#
+#
+#
 #Historical spread
 DIO_df %>%
   ggplot(aes(x = spreadkm)) + 
@@ -306,12 +306,12 @@ DIO_df %>%
   geom_histogram() +
   facet_wrap(~ season) +
   labs(title = "WAVE 2 per season")
-```
-
-### From this information we can see that wave 1 have a wider spread in the autumn and summer. Wave 2 seems more compact across seasons, spring has the wider spread. Which it confirms what we observed on the maps.
-### All of the trends are right skewed regardless of the season or wave. Let's try to fix that by transforming the data to log2
-
-```{r}
+#
+#
+#
+#
+#
+#
 DIO_df <- DIO_df %>%
   mutate(
     spread_log2 = log2(spreadkm)
@@ -350,15 +350,15 @@ DIO_df %>%
   facet_wrap(~ season) +
   labs(title = "WAVE 2 per season")
 
-```
-
-#### Transforming the data to log2 it helps the distribution
-
-# MODELING
-### Now let's see if we can predict spread based on known predictors
-
-# LM approach
-```{r}
+#
+#
+#
+#
+#
+#
+#
+#
+#
 #Making number variables into factors
 DIO_df %>%
   mutate(
@@ -380,10 +380,10 @@ lm_fit2 <- linear_reg() %>%
   set_engine("lm") %>% 
   fit(spread_log2 ~ wave + season + year + month, data = DIO_df)
 
-```
-
-### Getting the predictions
-```{r}
+#
+#
+#
+#
 #Predidiction and differences for each fit
 DIO_df <- DIO_df %>%
   mutate(
@@ -396,10 +396,10 @@ DIO_df <- DIO_df %>%
     res1 = pred1 - spread_log2,
     res2 = pred2 - spread_log2
   )
-```
-
-### Plotting predicted vs actual
-```{r}
+#
+#
+#
+#
 ggplot(DIO_df, aes(x = spread_log2, y = pred0)) +
     geom_point() +
     theme_bw()
@@ -412,10 +412,10 @@ ggplot(DIO_df, aes(x = spread_log2, y = pred2)) +
     geom_point() +
     theme_bw()
 
-```
-
-### Plotting the residuals
-```{r}
+#
+#
+#
+#
 ggplot(DIO_df, aes(x = spread_log2, y = res0)) +
     geom_point() +
     theme_bw()
@@ -427,12 +427,12 @@ ggplot(DIO_df, aes(x = spread_log2, y = res1)) +
 ggplot(DIO_df, aes(x = spread_log2, y = res2)) +
     geom_point() +
     theme_bw()
-```
-
-### It seems like lm is not a good approach for this dataset, it seems there is something underlaying with the data that I am not able to determine why the prediction power of the lm is just not working. I am going to try to fit other types.
-
-# LASSO
-```{r}
+#
+#
+#
+#
+#
+#
 #Set the seed
 rngseed <- 1234
 set.seed(rngseed)
@@ -441,6 +441,9 @@ set.seed(rngseed)
 lasso_fit <- linear_reg(penalty = 0.1) %>%
   set_engine("glmnet") %>% 
   fit(spread_log2 ~ wave + season + year + month + count + latitude + longitude, data = DIO_df)
+
+# Model summary
+lasso_fit
 
 # Creating prediction and residuals
 DIO_df <- DIO_df %>%
@@ -460,12 +463,12 @@ ggplot(DIO_df, aes(x = spread_log2, y = lasso_res)) +
   labs(title = "LASSO residuals") +
   theme_bw()
 
-```
-
-### LASSO also resembles a lot LM approach, therefore it is not a good model for this dataset. Let's try with rand_forest
-
-# RANDOM FOREST
-```{r}
+#
+#
+#
+#
+#
+#
 #Set the seed
 set.seed(rngseed)
 
@@ -500,110 +503,58 @@ ggplot(DIO_df, aes(x = spread_log2, y = rf_res)) +
   labs(title = "Random Forest residuals") +
   theme_bw()
 
-```
-
-### The random forest approach seems to capture much better the behavior of the dataset. We can see a slight trend before spread 7 (spread_log2) but the rest of the residuals seems random.
-
-# RMSE for all models using  a training dataset
-
-```{r}
-set.seed(rngseed)
-
-# Put 3/4 of the data into the training set 
-data_split <- initial_split(DIO_df, prop = 0.75)
-
-# Create data frames for the two sets:
-train_data <- training(data_split)
-test_data  <- testing(data_split)
-
-```
-
-```{r}
-# Generating predictions and RMSE per model
-
-predict_lm <- predict(lm_fit1, train_data) %>%
-  bind_cols(train_data)
-rmse_lm <- rmse(predict_lm, truth = spread_log2, estimate = .pred)
-
-predict_lasso <- predict(lasso_fit, train_data) %>%
-  bind_cols(train_data)
-rmse_lasso <- rmse(predict_lasso, truth = spread_log2, estimate = .pred)
-
-predict_rf <- predict(rf_fit, train_data) %>%
-  bind_cols(train_data)
-rmse_rf <- rmse(predict_rf, truth = spread_log2, estimate = .pred)
-
-rmse_lm
-rmse_lasso
-rmse_rf
-```
-
-#### the RMSE from the LM and LASSO is almost 10X higher than the RMSE from rand_forest() 
-
-# CROSS VALIDATION
-```{r}
-set.seed(rngseed)
-
-#Creating the folds
-folds <- vfold_cv(DIO_df, v = 10)
-folds
-```
-
-```{r}
-# CV for LM fit1
-lm_fit1_cv <- fit_resamples(
-  linear_reg() %>% set_engine("lm"), 
-  preprocessor = spread_log2 ~ wave + season + year + month + count + latitude + longitude,
-  resamples = folds,
-  metrics = metric_set(rmse)
-)
-
-# CV for LASSO
-# Note: Ensure you have the 'glmnet' package installed
-lasso_fit_cv <- fit_resamples(
-  linear_reg(penalty = 0.1, mixture = 1) %>% set_engine("glmnet"), 
-  preprocessor = spread_log2 ~ wave + season + year + month + count + latitude + longitude,
-  resamples = folds,
-  metrics = metric_set(rmse)
-)
-
-# CV for RF
-rf_fit_cv <- fit_resamples(
-  rf_spec, # Assuming rf_spec is already defined (e.g., rand_forest() %>% set_engine("ranger"))
-  preprocessor = spread_log2 ~ wave + season + year + month + count + latitude + longitude,
-  resamples = folds,
-  metrics = metric_set(rmse)
-)
-
-# results
-lm_fit1_res <- collect_metrics(lm_fit1_cv)
-lasso_fit_res <- collect_metrics(lasso_fit_cv)
-rf_fit_res <- collect_metrics(rf_fit_cv)
-
-lm_fit1_res
-lasso_fit_res
-rf_fit_res
-```
-
-# Honest Assessment
-```{r}
-# Create predictions using only the TEST data
-test_results <- test_data %>%
-  select(spread_log2) %>% 
-  mutate(
-    .pred = predict(rf_fit, new_data = test_data)$.pred,
-    .resid = .pred - spread_log2
-  )
-
-# Calculate the "Final" RMSE
-test_results %>%  
-  metrics(truth = spread_log2, estimate = .pred)
-
-test_results
-
-```
- 
-
- # TAKEAWAYS
- 
- #### For this exercise, I investigated the spatial distribution of the Diomedea genus to determine if seasonal changes and historical timeframes influenced their "spread" from a central high-frequency sighting coordinate. My findings supported the hypothesis that a seasonal effect exists; however, while "Wave 1" (pre-1983) showed a wider spread during autumn and summer, "Wave 2" (post-1983) exhibited a more compact distribution with the greatest spread shifting to the spring, suggesting a potential contraction of observed range over the years. Through the modeling process, I learned that linear approaches like LM and LASSO were insufficient for capturing these complex spatial trends, as evidenced by high RMSE values. In contrast, the Random Forest model successfully captured the non-linear relationships in the data, achieving a significantly lower RMSE and an R-squared of 0.994. Once I did cross validation I further corroborated the RF model model perforamce matched the RMSE closely to the RMSE of the training data set. Making it a good model even for unseen data.
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#

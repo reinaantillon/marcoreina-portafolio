@@ -1,0 +1,45 @@
+
+```r
+# Set the seed 
+set.seed(rngseed)
+
+# Create the 10-fold CV, repeated 10 times
+resamples_cv <- vfold_cv(DIO_df, v = 10, repeats = 5)
+
+#tuning RF model with CV
+
+#model specs
+rf_spec_cv <- rand_forest(
+  mode = "regression",
+  mtry = tune(),
+  min_n = tune(),
+  trees = 300
+) %>%
+  set_engine("ranger", seed = rngseed)
+
+#set recipe
+rf_recipe_cv <- recipe(spread_log2 ~ wave + season + year + month + count + latitude + longitude, data = DIO_df) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_numeric_predictors(), -all_outcomes())
+
+#model workflow
+rf_workflow_cv <- workflow() %>%
+  add_model(rf_spec_cv) %>% 
+  add_recipe(rf_recipe_cv)
+
+#model grid
+rf_grid_cv <- grid_regular(
+  mtry(range = c(1, 7)),
+  min_n(range = c(1, 21)),
+  levels = 7
+)
+
+#RF tuning
+rf_tune_cv <- tune_grid(
+  rf_workflow_cv,
+  resamples = resamples_cv,
+  grid = rf_grid_cv,
+  metrics = metric_set(rmse),
+  control = control_grid(save_pred = TRUE)
+)
+```
