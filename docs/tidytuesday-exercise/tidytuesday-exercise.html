@@ -694,32 +694,32 @@ e.g.:
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Creating a null linear model</span></span>
 <span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>lm_null <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spreadkm <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> trends_df)</span>
 <span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Including all variables and a stepwise approach (reverse)</span></span>
 <span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>lm_fit1 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> year <span class="sc">+</span> month <span class="sc">+</span> count <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spreadkm <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> year <span class="sc">+</span> month <span class="sc">+</span> count <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
 <span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>lm_fit2 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> year <span class="sc">+</span> month <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spreadkm <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> year <span class="sc">+</span> month <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
 <span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>lm_fit3 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> year <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spreadkm <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> year <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
 <span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>lm_fit4 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spreadkm <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
 <span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a>lm_fit5 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> season, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spreadkm <span class="sc">~</span> season, <span class="at">data =</span> trends_df)</span>
 <span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a>lm_fit6 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> wave, <span class="at">data =</span> trends_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spreadkm <span class="sc">~</span> wave, <span class="at">data =</span> trends_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="lets-get-the-predictions" class="level3">
 <h3 class="anchored" data-anchor-id="lets-get-the-predictions">Let’s get the predictions</h3>
@@ -817,6 +817,41 @@ e.g.:
 <div>
 <figure class="figure">
 <p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-14-7.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="checking-the-residuals" class="level3">
+<h3 class="anchored" data-anchor-id="checking-the-residuals">Checking the residuals</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(trends_df, <span class="fu">aes</span>(<span class="at">x =</span> spreadkm, <span class="at">y =</span> res0)) <span class="sc">+</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(trends_df, <span class="fu">aes</span>(<span class="at">x =</span> spreadkm, <span class="at">y =</span> res1)) <span class="sc">+</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-15-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(trends_df, <span class="fu">aes</span>(<span class="at">x =</span> spreadkm, <span class="at">y =</span> res2)) <span class="sc">+</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-15-3.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
