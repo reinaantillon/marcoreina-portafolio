@@ -366,7 +366,7 @@ e.g.:
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">genus_code =</span> <span class="fu">substr</span>(species_abbreviation, <span class="dv">1</span>, <span class="dv">3</span>),</span>
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">year  =</span> <span class="fu">year</span>(date),</span>
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">month =</span> <span class="fu">month</span>(date), </span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">lat_bin =</span> <span class="fu">floor</span>(latitude <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">*</span> <span class="dv">10</span>,</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">lat_bin =</span> <span class="fu">floor</span>(latitude <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">*</span> <span class="dv">10</span>, <span class="co">#creating larger bins for latitude and longitude</span></span>
 <span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">lon_bin =</span> <span class="fu">floor</span>(longitude <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">*</span> <span class="dv">10</span>,</span>
 <span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">count =</span> <span class="fu">as.numeric</span>(count)</span>
 <span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
@@ -390,8 +390,8 @@ e.g.:
 </div>
 </div>
 </div>
-<section id="seems-like-diomeda-is-the-genus-with-the-majority-of-observations-i-am-going-to-focus-on-that.-i-would-be-interested-to-understand-if-thera-are-any-seasonal-trends-first" class="level5">
-<h5 class="anchored" data-anchor-id="seems-like-diomeda-is-the-genus-with-the-majority-of-observations-i-am-going-to-focus-on-that.-i-would-be-interested-to-understand-if-thera-are-any-seasonal-trends-first">Seems like Diomeda is the genus with the majority of observations, I am going to focus on that. I would be interested to understand if thera are any seasonal trends first</h5>
+<section id="seems-like-diomeda-is-the-genus-with-the-majority-of-observations-i-am-going-to-focus-on-that.-i-would-be-interested-to-understand-if-thera-are-any-trends-i-would-like-to-focus-on" class="level5">
+<h5 class="anchored" data-anchor-id="seems-like-diomeda-is-the-genus-with-the-majority-of-observations-i-am-going-to-focus-on-that.-i-would-be-interested-to-understand-if-thera-are-any-trends-i-would-like-to-focus-on">Seems like Diomeda is the genus with the majority of observations, I am going to focus on that. I would be interested to understand if thera are any trends I would like to focus on</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>merged_df <span class="sc">%&gt;%</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(genus_code <span class="sc">==</span> <span class="st">"DIO"</span>) <span class="sc">%&gt;%</span></span>
@@ -409,11 +409,15 @@ e.g.:
 <section id="it-seems-the-major-genus-observed-it-is-observed-as-aggregated-species-probably-not-fully-distinguisable-from-afar-to-the-osberver" class="level4">
 <h4 class="anchored" data-anchor-id="it-seems-the-major-genus-observed-it-is-observed-as-aggregated-species-probably-not-fully-distinguisable-from-afar-to-the-osberver">It seems the major Genus observed it is observed as aggregated species (probably not fully distinguisable from afar to the osberver)</h4>
 </section>
-<section id="majority-of-the-times-diomedea-is-either-described-into-2-species" class="level4">
-<h4 class="anchored" data-anchor-id="majority-of-the-times-diomedea-is-either-described-into-2-species">Majority of the times Diomedea is either described into 2 species</h4>
+<section id="majority-of-the-times-diomedea-is-either-described-into-2-species-because-both-of-them-are-very-similar" class="level4">
+<h4 class="anchored" data-anchor-id="majority-of-the-times-diomedea-is-either-described-into-2-species-because-both-of-them-are-very-similar">Majority of the times Diomedea is either described into 2 species because both of them are very similar</h4>
 </section>
 <section id="additionally-sightings-have-two-different-time-frames-before-and-after-1983" class="level4">
 <h4 class="anchored" data-anchor-id="additionally-sightings-have-two-different-time-frames-before-and-after-1983">Additionally sightings have two different time frames (before and after 1983)</h4>
+</section>
+</section>
+<section id="lets-see-how-frequent-the-sighting-were-in-a-map-all-sightings-from-dio" class="level3">
+<h3 class="anchored" data-anchor-id="lets-see-how-frequent-the-sighting-were-in-a-map-all-sightings-from-dio">Let’s see how frequent the sighting were in a map: all sightings from DIO</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get world map data</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>world_map <span class="ot">&lt;-</span> <span class="fu">map_data</span>(<span class="st">"world"</span>)</span>
@@ -443,6 +447,9 @@ e.g.:
 </div>
 </div>
 </div>
+</section>
+<section id="now-lets-look-how-it-the-two-previous-groups-before-and-after-1983-had-different-behaviors" class="level3">
+<h3 class="anchored" data-anchor-id="now-lets-look-how-it-the-two-previous-groups-before-and-after-1983-had-different-behaviors">Now let’s look how it the two previous groups (before and after 1983) had different behaviors</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Sightings before 1983</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>merged_df <span class="sc">%&gt;%</span></span>
@@ -485,9 +492,11 @@ e.g.:
 </div>
 </div>
 </div>
+<section id="ok-from-this-information-i-can-see-there-are-trends-from-each-wave-are-differents-before-and-after-1983" class="level4">
+<h4 class="anchored" data-anchor-id="ok-from-this-information-i-can-see-there-are-trends-from-each-wave-are-differents-before-and-after-1983">Ok, from this information, I can see there are trends from each “wave” are differents (before and after 1983)</h4>
 </section>
-<section id="ok-from-this-information-i-can-see-there-are-trends-from-each-season-in-the-way-the-birds-are-spread.-it-seems-like-the-two-different-groups-before-and-after-1983-have-different-trends-and-within-those-groups-season-seems-to-be-important-and-i-will-look-mopre-into-it." class="level4">
-<h4 class="anchored" data-anchor-id="ok-from-this-information-i-can-see-there-are-trends-from-each-season-in-the-way-the-birds-are-spread.-it-seems-like-the-two-different-groups-before-and-after-1983-have-different-trends-and-within-those-groups-season-seems-to-be-important-and-i-will-look-mopre-into-it.">Ok from this information, I can see there are trends from each season in the way the birds are spread. It seems like the two different groups (before and after 1983) have different trends and within those groups season seems to be important and I will look mopre into it.</h4>
+<section id="lets-keep-looking-now-within-each-of-the-waves-per-season." class="level4">
+<h4 class="anchored" data-anchor-id="lets-keep-looking-now-within-each-of-the-waves-per-season.">Let’s keep looking, now within each of the “waves” per season.</h4>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Sightings before 1983 per season</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>merged_df <span class="sc">%&gt;%</span></span>
@@ -534,9 +543,286 @@ e.g.:
 </div>
 </div>
 </div>
-
-
 </section>
+<section id="it-seems-there-is-also-a-seasonal-effect-we-will-take-this-into-account-for-modeling" class="level4">
+<h4 class="anchored" data-anchor-id="it-seems-there-is-also-a-seasonal-effect-we-will-take-this-into-account-for-modeling">It seems there is also a seasonal effect, we will take this into account for modeling</h4>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Let's create the dataset of interest</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>trends_df <span class="ot">&lt;-</span> merged_df <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(genus_code <span class="sc">==</span> <span class="st">"DIO"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(lon_bin, lat_bin, season, year, month) <span class="sc">%&gt;%</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">sum</span>(count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">wave =</span> <span class="fu">if_else</span>(year <span class="sc">&gt;</span><span class="dv">1983</span>, <span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">geo =</span> <span class="fu">paste</span>(lon_bin, lat_bin, <span class="at">sep =</span> <span class="st">", "</span>)</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>freq_df <span class="ot">&lt;-</span> trends_df <span class="sc">%&gt;%</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(geo) <span class="sc">%&gt;%</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">sum</span>(count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(count))</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>freq_df</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 33 × 2
+   geo      count
+   &lt;chr&gt;    &lt;dbl&gt;
+ 1 150, -40  7749
+ 2 160, -40  6764
+ 3 170, -40  3828
+ 4 140, -40  3214
+ 5 160, -50  3164
+ 6 170, -50  1814
+ 7 150, -50  1455
+ 8 140, -50   517
+ 9 130, -40   364
+10 120, -40   226
+# ℹ 23 more rows</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="from-this-information-we-can-see-the-most-common-coordinates-for-sightings-for-dio-is-150--40-with-7749-birds-observed-there." class="level3">
+<h3 class="anchored" data-anchor-id="from-this-information-we-can-see-the-most-common-coordinates-for-sightings-for-dio-is-150--40-with-7749-birds-observed-there.">From this information we can see the most “common” coordinates for sightings for DIO is 150, -40 with 7749 birds observed there.</h3>
+</section>
+<section id="i-am-going-to-use-this-to-measure-spread-i-will-use-this-as-my-base-coordinate-group-and-measure-the-distance-between-this-high-frequency-coordinate-to-the-actual" class="level3">
+<h3 class="anchored" data-anchor-id="i-am-going-to-use-this-to-measure-spread-i-will-use-this-as-my-base-coordinate-group-and-measure-the-distance-between-this-high-frequency-coordinate-to-the-actual">I am going to use this to measure “spread” I will use this as my base coordinate group and measure the distance between this high frequency coordinate to the actual</h3>
+</section>
+</section>
+<section id="analysis" class="level1">
+<h1>ANALYSIS:</h1>
+<section id="hypothesis-the-spread-of-dio-is-greater-in-warmer-months-than-in-cold-monthsseasons." class="level3">
+<h3 class="anchored" data-anchor-id="hypothesis-the-spread-of-dio-is-greater-in-warmer-months-than-in-cold-monthsseasons.">Hypothesis: The spread of DIO is greater in warmer months than in cold months/seasons.</h3>
+</section>
+<section id="question-is-the-spread-getting-smaller-over-the-years" class="level3">
+<h3 class="anchored" data-anchor-id="question-is-the-spread-getting-smaller-over-the-years">Question: Is the spread getting smaller over the years?</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Let's calculate distance</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Setting the main coordinate bins</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>lat_i <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">40</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>lon_i <span class="ot">&lt;-</span> <span class="dv">150</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># As the Earth is a globe, we need a special formula to calculate distance from A to B</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geosphere)</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>trends_df <span class="ot">&lt;-</span> trends_df <span class="sc">%&gt;%</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">spreadkm =</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fu">distHaversine</span>(</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cbind</span>(lon_i, lat_i), </span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cbind</span>(lon_bin, lat_bin)</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>    )<span class="sc">/</span><span class="dv">1000</span>,</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">spread_rounded =</span> <span class="fu">round</span>(spreadkm<span class="sc">/</span><span class="dv">100</span>, <span class="at">digits =</span> <span class="dv">0</span>) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Histograms to understand spread across both waves</span></span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>trends_df <span class="sc">%&gt;%</span></span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> spread_rounded)) <span class="sc">+</span> </span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1000</span>) <span class="sc">+</span></span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> wave)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Seasons in wave 1</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>trends_df <span class="sc">%&gt;%</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(wave <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> spread_rounded)) <span class="sc">+</span> </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1000</span>) <span class="sc">+</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> season)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Seasons in wave 2</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>trends_df <span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(wave <span class="sc">==</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> spread_rounded)) <span class="sc">+</span> </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1000</span>) <span class="sc">+</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> season)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-11-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="from-this-information-we-can-see-that-wave-1-have-a-wider-spread-in-the-autumn-and-summer.-wave-2-seems-more-compact-across-seasons-spring-has-the-wider-spread.-which-it-confirms-what-we-observed-on-the-maps." class="level3">
+<h3 class="anchored" data-anchor-id="from-this-information-we-can-see-that-wave-1-have-a-wider-spread-in-the-autumn-and-summer.-wave-2-seems-more-compact-across-seasons-spring-has-the-wider-spread.-which-it-confirms-what-we-observed-on-the-maps.">From this information we can see that wave 1 have a wider spread in the autumn and summer. Wave 2 seems more compact across seasons, spring has the wider spread. Which it confirms what we observed on the maps.</h3>
+</section>
+<section id="all-of-the-trends-are-right-skewed-regardless-of-the-season-or-wave." class="level3">
+<h3 class="anchored" data-anchor-id="all-of-the-trends-are-right-skewed-regardless-of-the-season-or-wave.">All of the trends are right skewed regardless of the season or wave.</h3>
+</section>
+</section>
+<section id="modeling" class="level1">
+<h1>MODELING</h1>
+</section>
+<section id="now-lets-see-if-we-can-predict-spread-based-on-temporal-predictors" class="level1">
+<h1>Now let’s see if we can predict spread based on temporal predictors</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>trends_df <span class="sc">%&gt;%</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">as.factor</span>(year),</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">month =</span> <span class="fu">as.factor</span>(month)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 627 × 10
+   lon_bin lat_bin season year  month count  wave geo    spreadkm spread_rounded
+     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;  &lt;fct&gt; &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;          &lt;dbl&gt;
+ 1      60     -70 summer 1979  2         1     1 60, -…    5883.           5900
+ 2      60     -70 summer 1980  1         1     1 60, -…    5883.           5900
+ 3      70     -70 summer 1979  2         1     1 70, -…    5511.           5500
+ 4      80     -70 summer 1979  2         2     1 80, -…    5131.           5100
+ 5      80     -60 summer 1976  2         3     1 80, -…    5183.           5200
+ 6      90     -70 autumn 1979  3         1     1 90, -…    4753.           4800
+ 7      90     -60 autumn 1976  3         1     1 90, -…    4628.           4600
+ 8      90     -60 autumn 1979  3         4     1 90, -…    4628.           4600
+ 9      90     -60 spring 1985  10        6     2 90, -…    4628.           4600
+10      90     -60 summer 1980  1         6     1 90, -…    4628.           4600
+# ℹ 617 more rows</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>trends_df<span class="sc">$</span>spread_log2 <span class="ot">&lt;-</span> <span class="fu">log</span>(trends_df<span class="sc">$</span>spreadkm, <span class="at">base =</span> <span class="fu">exp</span>(<span class="dv">2</span>)) <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Creating a null linear model</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>lm_null <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Including all variables and a stepwise approach (reverse)</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>lm_fit1 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> year <span class="sc">+</span> month <span class="sc">+</span> count <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>lm_fit2 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> year <span class="sc">+</span> month <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>lm_fit3 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> year <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>lm_fit4 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> wave <span class="sc">+</span> season <span class="sc">+</span> lat_bin <span class="sc">+</span> lon_bin, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a>lm_fit5 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> season, <span class="at">data =</span> trends_df)</span>
+<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a>lm_fit6 <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(spread_log2 <span class="sc">~</span> wave, <span class="at">data =</span> trends_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="lets-get-the-predictions" class="level3">
+<h3 class="anchored" data-anchor-id="lets-get-the-predictions">Let’s get the predictions</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Predidiction and differences for each fit</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>trends_df <span class="ot">&lt;-</span> trends_df <span class="sc">%&gt;%</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred0 =</span> <span class="fu">predict</span>(lm_null, <span class="at">new_data =</span> trends_df, <span class="at">type =</span> <span class="st">"numeric"</span>)<span class="sc">$</span>.pred,</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred1 =</span> <span class="fu">predict</span>(lm_fit1, <span class="at">new_data =</span> trends_df, <span class="at">type =</span> <span class="st">"numeric"</span>)<span class="sc">$</span>.pred,</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred2 =</span> <span class="fu">predict</span>(lm_fit2, <span class="at">new_data =</span> trends_df, <span class="at">type =</span> <span class="st">"numeric"</span>)<span class="sc">$</span>.pred,</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred3 =</span> <span class="fu">predict</span>(lm_fit3, <span class="at">new_data =</span> trends_df, <span class="at">type =</span> <span class="st">"numeric"</span>)<span class="sc">$</span>.pred,</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred4 =</span> <span class="fu">predict</span>(lm_fit4, <span class="at">new_data =</span> trends_df, <span class="at">type =</span> <span class="st">"numeric"</span>)<span class="sc">$</span>.pred,</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred5 =</span> <span class="fu">predict</span>(lm_fit5, <span class="at">new_data =</span> trends_df, <span class="at">type =</span> <span class="st">"numeric"</span>)<span class="sc">$</span>.pred,</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred6 =</span> <span class="fu">predict</span>(lm_fit6, <span class="at">new_data =</span> trends_df, <span class="at">type =</span> <span class="st">"numeric"</span>)<span class="sc">$</span>.pred</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">res0 =</span> pred0 <span class="sc">-</span> spread_log2,</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">res1 =</span> pred1 <span class="sc">-</span> spread_log2,</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">res2 =</span> pred2 <span class="sc">-</span> spread_log2,</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">res3 =</span> pred3 <span class="sc">-</span> spread_log2,</span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">res4 =</span> pred4 <span class="sc">-</span> spread_log2,</span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">res5 =</span> pred5 <span class="sc">-</span> spread_log2,</span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">res6 =</span> pred6 <span class="sc">-</span> spread_log2</span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="checking-for-predicted-vs-actual" class="level3">
+<h3 class="anchored" data-anchor-id="checking-for-predicted-vs-actual">Checking for predicted vs actual</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Null model</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(trends_df, <span class="fu">aes</span>(<span class="at">x =</span> spreadkm, <span class="at">y =</span> pred0)) <span class="sc">+</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(trends_df, <span class="fu">aes</span>(<span class="at">x =</span> spreadkm, <span class="at">y =</span> pred1)) <span class="sc">+</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-14-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(trends_df, <span class="fu">aes</span>(<span class="at">x =</span> spreadkm, <span class="at">y =</span> pred2)) <span class="sc">+</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-14-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(trends_df, <span class="fu">aes</span>(<span class="at">x =</span> spreadkm, <span class="at">y =</span> pred3)) <span class="sc">+</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-14-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(trends_df, <span class="fu">aes</span>(<span class="at">x =</span> spreadkm, <span class="at">y =</span> pred4)) <span class="sc">+</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-14-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(trends_df, <span class="fu">aes</span>(<span class="at">x =</span> spreadkm, <span class="at">y =</span> pred5)) <span class="sc">+</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-14-6.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(trends_df, <span class="fu">aes</span>(<span class="at">x =</span> spreadkm, <span class="at">y =</span> pred6)) <span class="sc">+</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-14-7.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
 </section>
 </section>
 
