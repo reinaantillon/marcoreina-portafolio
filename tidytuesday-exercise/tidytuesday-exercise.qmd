@@ -255,154 +255,217 @@ lon_i <- 150
 # As the Earth is a globe, we need a special formula to calculate distance from A to B
 library(geosphere)
 
-trends_df <- trends_df %>%
+DIO_df <- merged_df %>%
+  filter(genus_code == "DIO") 
+
+DIO_df$species_scientific_name = NULL
+DIO_df$species_common_name = NULL
+DIO_df$species_abbreviation = NULL
+DIO_df$genus_code = NULL
+DIO_df$genus = NULL
+
+DIO_df <- DIO_df %>%
   mutate(
     spreadkm = 1 + distHaversine(
       cbind(lon_i, lat_i), 
-      cbind(lon_bin, lat_bin)
+      cbind(longitude, latitude)
     )/1000,
-    spread_rounded = round(spreadkm/100, digits = 0) * 100
+    spread_rounded = round(spreadkm/10, digits = 0) * 10,
+    wave = if_else(year >1983, 2, 1)
   ) 
+```
+
+### After creating the spread indicator, I am creating histograms to understand trends
+  
+```{r}
+#Historical spread
+DIO_df %>%
+  ggplot(aes(x = spreadkm)) + 
+  geom_histogram() +
+  labs(title = "HISTORICAL")
 
 #Histograms to understand spread across both waves
-trends_df %>%
-  ggplot(aes(x = spread_rounded)) + 
-  geom_histogram(binwidth = 1000) +
-  facet_wrap(~ wave)
+DIO_df %>%
+  ggplot(aes(x = spreadkm)) + 
+  geom_histogram() +
+  facet_wrap(~ wave) +
+  labs(title = "HISTORICAL PER WAVE")
 
 #Seasons in wave 1
-trends_df %>%
+DIO_df %>%
   filter(wave == 1) %>%
-  ggplot(aes(x = spread_rounded)) + 
-  geom_histogram(binwidth = 1000) +
-  facet_wrap(~ season)
+  ggplot(aes(x = spreadkm)) + 
+  geom_histogram() +
+  facet_wrap(~ season) +
+  labs(title = "WAVE 1 per season")
 
 #Seasons in wave 2
-trends_df %>%
+DIO_df %>%
   filter(wave == 2) %>%
-  ggplot(aes(x = spread_rounded)) + 
-  geom_histogram(binwidth = 1000) +
-  facet_wrap(~ season)
+  ggplot(aes(x = spreadkm)) + 
+  geom_histogram() +
+  facet_wrap(~ season) +
+  labs(title = "WAVE 2 per season")
 ```
 
 ### From this information we can see that wave 1 have a wider spread in the autumn and summer. Wave 2 seems more compact across seasons, spring has the wider spread. Which it confirms what we observed on the maps.
-### All of the trends are right skewed regardless of the season or wave.
+### All of the trends are right skewed regardless of the season or wave. Let's try to fix that by transforming the data to log2
+
+```{r}
+DIO_df <- DIO_df %>%
+  mutate(
+    spread_log2 = log2(spreadkm)
+  ) %>%
+    filter(
+      !spread_log2 == 0
+    )
+
+#Let's repeat the histograms
+#Historical spread
+DIO_df %>%
+  ggplot(aes(x = spread_log2)) + 
+  geom_histogram() +
+  labs(title = "HISTORICAL")
+
+#Histograms to understand spread across both waves
+DIO_df %>%
+  ggplot(aes(x = spread_log2)) + 
+  geom_histogram() +
+  facet_wrap(~ wave) +
+  labs(title = "HISTORICAL PER WAVE")
+
+#Seasons in wave 1
+DIO_df %>%
+  filter(wave == 1) %>%
+  ggplot(aes(x = spread_log2)) + 
+  geom_histogram() +
+  facet_wrap(~ season) +
+  labs(title = "WAVE 1 per season")
+
+#Seasons in wave 2
+DIO_df %>%
+  filter(wave == 2) %>%
+  ggplot(aes(x = spread_log2)) + 
+  geom_histogram() +
+  facet_wrap(~ season) +
+  labs(title = "WAVE 2 per season")
+
+```
+
+#### 
 
 # MODELING
-# Now let's see if we can predict spread based on temporal predictors
+# Now let's see if we can predict spread based on known predictors
 ```{r}
-trends_df %>%
+#Making number variables into factors
+DIO_df %>%
   mutate(
     year = as.factor(year),
     month = as.factor(month)
   )
 
-trends_df$spread_log2 <- log(trends_df$spreadkm, base = exp(2)) + 1
-
 #Creating a null linear model
 lm_null <- linear_reg() %>%
   set_engine("lm") %>% 
-  fit(spreadkm ~ 1, data = trends_df)
+  fit(spread_log2 ~ 1, data = DIO_df)
 
-#Including all variables and a stepwise approach (reverse)
+#Creating models with known variables
 lm_fit1 <- linear_reg() %>%
   set_engine("lm") %>% 
-  fit(spreadkm ~ wave + season + year + month + count + lat_bin + lon_bin, data = trends_df)
+  fit(spread_log2 ~ wave + season + year + month + count + latitude + longitude, data = DIO_df)
 
 lm_fit2 <- linear_reg() %>%
   set_engine("lm") %>% 
-  fit(spreadkm ~ wave + season + year + month + lat_bin + lon_bin, data = trends_df)
-
-lm_fit3 <- linear_reg() %>%
-  set_engine("lm") %>% 
-  fit(spreadkm ~ wave + season + year + lat_bin + lon_bin, data = trends_df)
-
-lm_fit4 <- linear_reg() %>%
-  set_engine("lm") %>% 
-  fit(spreadkm ~ wave + season + lat_bin + lon_bin, data = trends_df)
-
-lm_fit5 <- linear_reg() %>%
-  set_engine("lm") %>% 
-  fit(spreadkm ~ season, data = trends_df)
-
-lm_fit6 <- linear_reg() %>%
-  set_engine("lm") %>% 
-  fit(spreadkm ~ wave, data = trends_df)
+  fit(spread_log2 ~ wave + season + year + month, data = DIO_df)
 
 ```
 
-### Let's get the predictions
+### Getting the predictions
 ```{r}
 #Predidiction and differences for each fit
-trends_df <- trends_df %>%
+DIO_df <- DIO_df %>%
   mutate(
-    pred0 = predict(lm_null, new_data = trends_df, type = "numeric")$.pred,
-    pred1 = predict(lm_fit1, new_data = trends_df, type = "numeric")$.pred,
-    pred2 = predict(lm_fit2, new_data = trends_df, type = "numeric")$.pred,
-    pred3 = predict(lm_fit3, new_data = trends_df, type = "numeric")$.pred,
-    pred4 = predict(lm_fit4, new_data = trends_df, type = "numeric")$.pred,
-    pred5 = predict(lm_fit5, new_data = trends_df, type = "numeric")$.pred,
-    pred6 = predict(lm_fit6, new_data = trends_df, type = "numeric")$.pred
+    pred0 = predict(lm_null, new_data = DIO_df, type = "numeric")$.pred,
+    pred1 = predict(lm_fit1, new_data = DIO_df, type = "numeric")$.pred,
+    pred2 = predict(lm_fit2, new_data = DIO_df, type = "numeric")$.pred
   ) %>%
     mutate(
     res0 = pred0 - spread_log2,
     res1 = pred1 - spread_log2,
-    res2 = pred2 - spread_log2,
-    res3 = pred3 - spread_log2,
-    res4 = pred4 - spread_log2,
-    res5 = pred5 - spread_log2,
-    res6 = pred6 - spread_log2
+    res2 = pred2 - spread_log2
   )
 ```
 
-### Checking for predicted vs actual
-
+### Plotting predicted vs actual
 ```{r}
-#Null model
-ggplot(trends_df, aes(x = spreadkm, y = pred0)) +
-    geom_point(size = 2) +
+ggplot(DIO_df, aes(x = spread_log2, y = pred0)) +
+    geom_point() +
     theme_bw()
 
-ggplot(trends_df, aes(x = spreadkm, y = pred1)) +
-    geom_point(size = 2) +
+ggplot(DIO_df, aes(x = spread_log2, y = pred1)) +
+    geom_point() +
     theme_bw()
 
-ggplot(trends_df, aes(x = spreadkm, y = pred2)) +
-    geom_point(size = 2) +
+ggplot(DIO_df, aes(x = spread_log2, y = pred2)) +
+    geom_point() +
     theme_bw()
 
-ggplot(trends_df, aes(x = spreadkm, y = pred3)) +
-    geom_point(size = 2) +
+```
+
+### Plotting the residuals
+```{r}
+ggplot(DIO_df, aes(x = spread_log2, y = res0)) +
+    geom_point() +
     theme_bw()
 
-ggplot(trends_df, aes(x = spreadkm, y = pred4)) +
-    geom_point(size = 2) +
+ggplot(DIO_df, aes(x = spread_log2, y = res1)) +
+    geom_point() +
     theme_bw()
 
-ggplot(trends_df, aes(x = spreadkm, y = pred5)) +
-    geom_point(size = 2) +
-    theme_bw()
-
-ggplot(trends_df, aes(x = spreadkm, y = pred6)) +
-    geom_point(size = 2) +
+ggplot(DIO_df, aes(x = spread_log2, y = res2)) +
+    geom_point() +
     theme_bw()
 ```
 
-### Checking the residuals
+### It seems like lm is not a good approach for this dataset, it seems there is something underlaying with the data that I am not able to determine why the prediction power of the lm is just not working. I am going to try to fit a Rand_forest
 
+# RANDOM FOREST
 ```{r}
-ggplot(trends_df, aes(x = spreadkm, y = res0)) +
-    geom_point(size = 1, alpha = 0.5) +
-    theme_bw()
+#Set the seed
+rngseed <- set.seed(1234)
 
-ggplot(trends_df, aes(x = spreadkm, y = res1)) +
-    geom_point(size = 1, alpha = 0.5) +
-    theme_bw()
+# Define the model spec
+rf_spec <- rand_forest(mode = "regression") %>%
+  set_engine("ranger", seed = rngseed) 
 
-ggplot(trends_df, aes(x = spreadkm, y = res2)) +
-    geom_point(size = 1, alpha = 0.5) +
-    theme_bw()
+# Fit the model
+rf_fit <- rf_spec %>%
+  fit(spread_log2 ~ wave + season + year + month + count + latitude + longitude, data = DIO_df)
+
+# Model summary
+rf_fit
+
+
+DIO_df <- DIO_df %>%
+  mutate(
+    rf_pred = predict(rf_fit, new_data = DIO_df)$.pred,
+    rf_res  = rf_pred - spread_log2
+  )
+
+# New Pred vs Actual Plot
+ggplot(DIO_df, aes(x = spread_log2, y = rf_pred)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Random Forest") +
+  theme_bw()
+
+ggplot(DIO_df, aes(x = spread_log2, y = rf_res)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Random Forest") +
+  theme_bw()
+
 ```
 
-
+### The random forest approach seems to capture much better the behavior of the dataset. We can see a slight trend before spread 7 (spread_log2) but the rest of the residuals seems random.
 
