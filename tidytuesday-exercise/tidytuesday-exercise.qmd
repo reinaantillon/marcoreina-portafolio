@@ -125,7 +125,7 @@ merged_df %>%
 
 ```{r}
 # Get world map data
-world_map <- map_data("worldHires")
+world_map <- map_data("world")
 
 #All sightings of DIO
 merged_df %>%
@@ -137,10 +137,13 @@ merged_df %>%
                aes(x = long, y = lat, group = group), 
                fill = "gray90", color = "gray50", size = 0.1) +
   geom_raster(aes(x = lon_bin, y = lat_bin, fill = count)) +
-  scale_fill_viridis_c(option = "mako", direction = -1, alpha = 0.5) +
+  scale_fill_viridis_c(option = "plasma", direction = -1, alpha = 0.5) +
   coord_quickmap(xlim = c(50, 180), ylim = c(-75, -25)) +
   theme_bw()
 
+```
+
+```{r}
 #Sightings before 1983
 merged_df %>%
   filter(genus_code == "DIO", year <= 1983) %>%
@@ -151,24 +154,9 @@ merged_df %>%
                aes(x = long, y = lat, group = group), 
                fill = "gray90", color = "gray50", size = 0.1) +
   geom_raster(aes(x = lon_bin, y = lat_bin, fill = count)) +
-  scale_fill_viridis_c(option = "mako", direction = -1, alpha = 0.5) +
+  scale_fill_viridis_c(option = "plasma", direction = -1, alpha = 0.5) +
   coord_quickmap(xlim = c(50, 180), ylim = c(-75, -25)) + 
   theme_bw()
-
-#Sightings before 1983 per season
-merged_df %>%
-  filter(genus_code == "DIO", year <= 1983) %>%
-  group_by(lon_bin, lat_bin, season) %>%
-  summarise(count = sum(count, na.rm = TRUE), .groups = "drop") %>%
-  ggplot() +
-  geom_polygon(data = world_map, 
-               aes(x = long, y = lat, group = group), 
-               fill = "gray90", color = "gray50", size = 0.1) +
-  geom_raster(aes(x = lon_bin, y = lat_bin, fill = count)) +
-  scale_fill_viridis_c(option = "mako", direction = -1, alpha = 0.5) +
-  coord_quickmap(xlim = c(50, 180), ylim = c(-75, -25)) + 
-  theme_bw() +
-  facet_wrap(~season)
 
 #Sightings after 1983
 merged_df %>%
@@ -180,10 +168,35 @@ merged_df %>%
                aes(x = long, y = lat, group = group), 
                fill = "gray90", color = "gray50", size = 0.1) +
   geom_raster(aes(x = lon_bin, y = lat_bin, fill = count)) +
-  scale_fill_viridis_c(option = "mako", direction = -1, alpha = 0.5) +
+  scale_fill_viridis_c(option = "plasma", direction = -1, alpha = 0.5) +
   coord_quickmap(xlim = c(50, 180), ylim = c(-75, -25)) + 
   theme_bw()
 
+```
+
+#### Ok from this information, I can see there are trends from each season in the way the birds are spread. It seems like the two different groups (before and after 1983) have different trends and within those groups season seems to be important and I will look mopre into it. 
+
+
+```{r}
+#Sightings before 1983 per season
+merged_df %>%
+  filter(genus_code == "DIO", year <= 1983) %>%
+  group_by(lon_bin, lat_bin, season) %>%
+  summarise(count = sum(count, na.rm = TRUE), .groups = "drop") %>%
+  ggplot() +
+  geom_polygon(data = world_map, 
+               aes(x = long, y = lat, group = group), 
+               fill = "gray90", color = "gray50", size = 0.1) +
+  geom_raster(aes(x = lon_bin, y = lat_bin, fill = count)) +
+  scale_fill_viridis_c(option = "plasma", direction = -1, alpha = 0.5) +
+  coord_quickmap(xlim = c(50, 180), ylim = c(-75, -25)) + 
+  theme_bw() +
+  facet_wrap(~season)
+
+```
+
+
+```{r}
 #Sightings after 1983 per season
 merged_df %>%
   filter(genus_code == "DIO", year > 1983) %>%
@@ -194,11 +207,8 @@ merged_df %>%
                aes(x = long, y = lat, group = group), 
                fill = "gray90", color = "gray50", size = 0.1) +
   geom_raster(aes(x = lon_bin, y = lat_bin, fill = count)) +
-  scale_fill_viridis_c(option = "mako", direction = -1, alpha = 0.5) +
+  scale_fill_viridis_c(option = "plasma", direction = -1, alpha = 0.5) +
   coord_quickmap(xlim = c(50, 180), ylim = c(-75, -25)) +
   theme_bw() +
   facet_wrap(~season)
 ```
-
-#### Ok from this information, I can see there are trends from each season in the way the birds are spread. It seems like the two different groups (before and after 1983) have different trends and within those groups season seems to be important and I will look mopre into it. 
-
