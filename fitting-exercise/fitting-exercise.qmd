@@ -455,3 +455,108 @@ ggplot(plot_data, aes(x = Y)) +
   theme_bw()
 ```
 
+#### MR: I copied and pasted this code submitted by ALEXANDRA TEJADA-STROP from a pull request, the merge had conflicts that could not be resolved. 
+
+# This section added by ALEXANDRA TEJADA-STROP
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+
+# Predicted versus observed plot for all 3 models on training data
+
+# Null model predictions
+null_preds_plot <- train_data %>%
+  mutate(.pred = mean(train_data$Y), model = "Null model") %>%
+  select(Y, .pred, model)
+
+# Model 1 predictions
+m1_preds_plot <- predict(new_model1, train_data) %>%
+  bind_cols(train_data %>% select(Y)) %>%
+  mutate(model = "Model 1: DOSE only") %>%
+  select(Y, .pred, model)
+
+# Model 2 predictions
+m2_preds_plot <- predict(new_model2, train_data) %>%
+  bind_cols(train_data %>% select(Y)) %>%
+  mutate(model = "Model 2: All predictors") %>%
+  select(Y, .pred, model)
+
+# Combine all predictions
+pred_plot_df <- bind_rows(null_preds_plot, m1_preds_plot, m2_preds_plot)
+
+# Plot observed versus predicted
+ggplot(pred_plot_df, aes(x = Y, y = .pred, color = model)) +
+  geom_point(alpha = 0.7) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  coord_cartesian(xlim = c(0, 5000), ylim = c(0, 5000)) +
+  labs(
+    title = "Observed versus predicted values on training data",
+    x = "Observed Y",
+    y = "Predicted Y",
+    color = "Model"
+  ) +
+  theme_bw()
+```
+
+# Residual plot for Model 2
+```{r}
+resid_df <- predict(new_model2, train_data) %>%
+  bind_cols(train_data %>% select(Y)) %>%
+  mutate(residual = .pred - Y)
+
+ggplot(resid_df, aes(x = .pred, y = residual)) +
+  geom_point(alpha = 0.7) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  coord_cartesian(ylim = c(-2500, 2500)) +
+  labs(
+    title = "Residuals versus predicted values for Model 2",
+    x = "Predicted Y",
+    y = "Residuals"
+  ) +
+  theme_bw()
+```
+
+```{r}
+# Bootstrap uncertainty for Model 2
+set.seed(rngseed)
+dat_bs <- bootstraps(train_data, times = 100)
+
+pred_bs <- matrix(NA, nrow = 100, ncol = nrow(train_data))
+
+for (i in 1:100) {
+  dat_sample <- rsample::analysis(dat_bs$splits[[i]])
+  
+  bs_fit <- linear_reg() %>%
+    set_engine("lm") %>%
+    fit(Y ~ DOSE + AGE + SEX + WT + HT, data = dat_sample)
+  
+  pred_bs[i, ] <- predict(bs_fit, new_data = train_data)$.pred
+}
+
+preds <- apply(pred_bs, 2, quantile, c(0.055, 0.5, 0.945)) %>%
+  t() %>%
+  as.data.frame()
+
+colnames(preds) <- c("lower", "median", "upper")
+
+orig_preds <- predict(new_model2, train_data) %>%
+  bind_cols(train_data %>% select(Y))
+
+boot_plot_df <- orig_preds %>%
+  bind_cols(preds)
+
+ggplot(boot_plot_df, aes(x = Y)) +
+  geom_point(aes(y = .pred), alpha = 0.7) +
+  geom_point(aes(y = median), shape = 1, color = "blue") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), alpha = 0.3, color = "blue") +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  coord_cartesian(xlim = c(0, 5000), ylim = c(0, 5000)) +
+  labs(
+    title = "Observed versus predicted with bootstrap uncertainty",
+    x = "Observed Y",
+    y = "Predicted Y"
+  ) +
+  theme_bw()
+```
+
