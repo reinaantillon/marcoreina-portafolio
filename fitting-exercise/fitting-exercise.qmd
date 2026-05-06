@@ -315,6 +315,20 @@ res_cv_model1
 res_cv_model2
 ```
 
+### Changes/improvements in 10A
+
+```{r}
+# Summary Table for 10A
+model_comparison <- tibble(
+  Model = c("Null Model", "Model 1 (Dose)", "Model 2 (Full)"),
+  Train_RMSE = c(rmse_null_model, rmse_model1$.estimate, rmse_model2$.estimate),
+  CV_RMSE = c(NA, res_cv_model1$mean, res_cv_model2$mean)
+)
+knitr::kable(model_comparison, digits = 2, caption = "Model Performance Comparison (10A)")
+```
+
+Based on the model comparison, Model 2 (Full Model) provided the best fit with an RMSE of 627 on the training data. The inclusion of physical characteristics, particularly Weight (WT), significantly improved the model's predictive power over the Dose-only model. The CV results confirm that this improvement is consistent across different folds.
+
 # Code made by MR
 #### (I contributed to other repo and waited but did not recieved the pull request from the other person, so I am pasting the code I contributed to them but I adapted it to mine)
 

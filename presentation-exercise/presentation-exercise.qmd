@@ -93,6 +93,15 @@ plot_2023 <- ggplot(map_2023, aes(long, lat, group = group, fill = prod_bin)) +
 plot_2023
 ```
 
+### Changes/improvements in exercise 6
+
+```{r}
+#| label: original-image
+#| fig-cap: "Original visualization from Our World in Data."
+#| echo: false
+knitr::include_graphics(here("presentation-exercise/original_graph.PNG"))
+```
+
 # Creating a table using this same information
 
 ChatGPT prompt: "I want to make an interactive table for chicken consumption from around the world that integrates some graphs within the table, i have information from 1961 to 2023"
@@ -135,20 +144,10 @@ table_chicken <- clean_data_table %>%
 ### ChatGPT response:
 
 reactable( table_data, columns = list( country = colDef(name = "Country"),
-       
-latest_2023 = colDef(
-  name = "Consumption (2023)",
-  format = colFormat(digits = 1)
-),
 
-trend = colDef(
-  name = "1961–2023 Trend",
-  cell = function(values) {
-    sparkline(values, type = "line")
-  },
-  html = TRUE
-)
-), searchable = TRUE, sortable = TRUE, highlight = TRUE, striped = TRUE )
+latest_2023 = colDef( name = "Consumption (2023)", format = colFormat(digits = 1) ),
+
+trend = colDef( name = "1961–2023 Trend", cell = function(values) { sparkline(values, type = "line") }, html = TRUE ) ), searchable = TRUE, sortable = TRUE, highlight = TRUE, striped = TRUE )
 
 ### Code adapted by MR
 
