@@ -1,6 +1,8 @@
 # Presentation exercise
 
-Food and Agriculture Organization of the United Nations (2025) – with major processing by Our World in Data. “Chicken meat production – UN FAO” \[dataset\]. Food and Agriculture Organization of the United Nations, “Production: Crops and livestock products” \[original data\]. Retrieved February 18, 2026 from https://archive.ourworldindata.org/20260119-235736/grapher/chicken-meat-production.html (archived on January 19, 2026).
+Food and Agriculture Organization of the United Nations (2025) – with major processing by Our World in Data. "Chicken meat production – UN FAO" [dataset]. Food and Agriculture Organization of the United Nations, "Production: Crops and livestock products" [original data]. 
+
+Retrieved February 18, 2026 from [Our World in Data archive](https://archive.ourworldindata.org/20260119-235736/grapher/chicken-meat-production.html) (archived on January 19, 2026).
 
 ```{r}
 # Loading used libraries
@@ -95,12 +97,15 @@ plot_2023
 
 ### Changes/improvements in exercise 6
 
+### Original visualization from Our World in Data
 ```{r}
 #| label: original-image
-#| fig-cap: "Original visualization from Our World in Data."
+#| out-width: "100%"
 #| echo: false
 knitr::include_graphics(here("presentation-exercise/original_graph.PNG"))
 ```
+
+For this exercise, I recreated a global map of chicken meat production originally published by Our World in Data. My version successfully replicates the color-coded categorical bins, ranging from under 100,000 tonnes to over 10 million tonnes. One notable difference is the map projection; while the original uses a projection that minimizes shape distortion at the poles, this recreation uses a standard longitude/latitude coordinate system. Additionally, the original graph is interactive, it is a feature I did not include for this exercise (not in the scope of this module) but looking forward to do it in the future.
 
 # Creating a table using this same information
 
@@ -193,3 +198,5 @@ reactable(
 ```
 
 ### Table shows the 2023 production and the change percentage compared to 2022. Conditional formatting is shown as black for for -5% to 5%, green for +5% and above, red for -5% and under. Table can be searched and sorted.
+
+Beyond the map, I developed an interactive table that provides deeper context. While the map shows a static snapshot of 2023, the table includes sparklines representing production trends from 1961 to 2023. This reveals that while production has scaled globally, countries like Brazil have seen exponential growth compared to more established markets. The conditional formatting in the "Change" column highlights countries where production is currently accelerating (green) or declining (red), providing an analytical layer not present in the original visualization.
